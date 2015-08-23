@@ -7,6 +7,7 @@ import java.util.List;
 
 import fr.gouv.agriculture.geojson.Polygon;
 import fr.gouv.agriculture.graph.Node;
+import fr.gouv.agriculture.graph.utils.NodeUtils;
 
 public class ConvexHullBuilder implements HullBuilder {
 	
@@ -90,17 +91,7 @@ public class ConvexHullBuilder implements HullBuilder {
 	public Polygon buildHull(List<Node> nodes) {
 		
 		List<Node> hullNodes = convexHull(nodes);
-		List<List<Double>> exteriorRing = new ArrayList<List<Double>>();
-		for (Node node : hullNodes) {
-			exteriorRing.add(node.asCoordinatePair());
-		}
-		
-		List<List<List<Double>>> coordinates = new ArrayList<List<List<Double>>>();
-		coordinates.add(exteriorRing);
-		Polygon polygon = new Polygon();
-		polygon.coordinates = coordinates;
-		
-		return polygon;
+		return NodeUtils.asPolygon(hullNodes);
 		
 	}
 

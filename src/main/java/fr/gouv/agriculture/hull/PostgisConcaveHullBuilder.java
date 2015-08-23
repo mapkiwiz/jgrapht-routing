@@ -45,7 +45,7 @@ public class PostgisConcaveHullBuilder implements HullBuilder {
 		}
 		template.batchUpdate("INSERT INTO isochrone_points (geom) VALUES (st_makepoint(?, ?))", points);
 		duration_loading = System.currentTimeMillis() - start;
-		String json = template.queryForObject("SELECT st_asgeojson(st_concavehull(st_collect(geom), .75, false), 6) FROM isochrone_points", String.class);
+		String json = template.queryForObject("SELECT st_asgeojson(st_concavehull(st_collect(geom), .98, false), 6) FROM isochrone_points", String.class);
 		duration_hull = System.currentTimeMillis() - start - duration_loading;
 		
 		txManager.rollback(tx);

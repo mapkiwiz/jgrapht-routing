@@ -47,10 +47,10 @@ public class TestPostgisConcaveHull {
 		double distance = 50000.0;
 		List<Node> isochrone = Isochrone.isochroneRaw(graph, source, distance);
 
-		PostgisConcaveHullBuilder hullbuilder = new PostgisConcaveHullBuilder(dataSource);
-		Polygon hull = hullbuilder.buildHull(isochrone);
-		double duration_loading = hullbuilder.getLoadingDurationSeconds();
-		double duration_concavehull = hullbuilder.getHullDurationSeconds();
+		PostgisConcaveHullBuilder hullBuilder = new PostgisConcaveHullBuilder(dataSource);
+		Polygon hull = hullBuilder.buildHull(isochrone);
+		double duration_loading = hullBuilder.getLoadingDurationSeconds();
+		double duration_concavehull = hullBuilder.getHullDurationSeconds();
 		
 		assertNotNull(hull);
 		System.out.println(hull.toGeoJSON());
