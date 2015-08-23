@@ -11,11 +11,9 @@ public class Node implements Serializable {
 	 */
 	private static final long serialVersionUID = -2627482846992484129L;
 	
-	int id;
-	double lon;
-	double lat;
-	
-	public Node() {}
+	public final int id;
+	public final double lon;
+	public final double lat;
 	
 	public Node(int id, double lon, double lat) {
 		this.id = id;

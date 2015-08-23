@@ -1,11 +1,14 @@
-package fr.gouv.agriculture.graph;
+package fr.gouv.agriculture.hull;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class ConvexHull {
+import fr.gouv.agriculture.geojson.Polygon;
+import fr.gouv.agriculture.graph.Node;
+
+public class ConvexHullBuilder implements HullBuilder {
 	
 	public static List<Node> convexHull(List<Node> nodes) {
 		
@@ -15,7 +18,7 @@ public class ConvexHull {
 			return new ArrayList<Node>(nodes);
 		}
 		
-		Collections.sort(nodes, new ConvexHull.NodeComparator());
+		Collections.sort(nodes, new ConvexHullBuilder.NodeComparator());
 		Node[] hull = new Node[2 * nodes.size()];
 		
 		// lower hull
@@ -82,6 +85,23 @@ public class ConvexHull {
 			
 		}
 
+	}
+
+	public Polygon buildHull(List<Node> nodes) {
+		
+		List<Node> hullNodes = convexHull(nodes);
+		List<List<Double>> exteriorRing = new ArrayList<List<Double>>();
+		for (Node node : hullNodes) {
+			exteriorRing.add(node.asCoordinatePair());
+		}
+		
+		List<List<List<Double>>> coordinates = new ArrayList<List<List<Double>>>();
+		coordinates.add(exteriorRing);
+		Polygon polygon = new Polygon();
+		polygon.coordinates = coordinates;
+		
+		return polygon;
+		
 	}
 
 }

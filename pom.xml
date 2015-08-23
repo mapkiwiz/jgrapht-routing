@@ -273,6 +273,18 @@
 			<version>1.1</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.github.davidmoten</groupId>
+			<artifactId>rtree</artifactId>
+    		<version>0.6.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>9.3-1103-jdbc4</version>
+		</dependency>
+
 	</dependencies>
 
 </project>

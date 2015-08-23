@@ -15,5 +15,12 @@ public abstract class GeoJsonObject implements Serializable {
 		GsonBuilder gson = new GsonBuilder();
 		return gson.create().toJson(this);
 	}
+	
+	public static GeoJsonObject parse(String json) throws GeoJsonFormatException {
+		
+		GeoJsonParser parser = new GeoJsonParser();
+		return parser.parse(json);
+		
+	}
 
 }

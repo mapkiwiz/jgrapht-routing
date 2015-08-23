@@ -8,6 +8,7 @@ import org.jgrapht.Graph;
 import org.jgrapht.traverse.ClosestFirstIterator;
 
 import fr.gouv.agriculture.geojson.Polygon;
+import fr.gouv.agriculture.hull.ConvexHullBuilder;
 
 public class Isochrone {
 	
@@ -16,8 +17,17 @@ public class Isochrone {
 		assert(distance > 0);
 		
 		List<Node> nodes = ShortestPath.searchByDistance(graph, source, distance);
-		List<Node> convexHull = ConvexHull.convexHull(nodes);
+		List<Node> convexHull = ConvexHullBuilder.convexHull(nodes);
 		return convexHull;
+		
+	}
+	
+	public static <E> List<Node> isochroneRaw(Graph<Node, E> graph, Node source, double distance) {
+		
+		assert(distance > 0);
+		
+		List<Node> nodes = ShortestPath.searchByDistance(graph, source, distance);
+		return nodes;
 		
 	}
 	
@@ -57,7 +67,7 @@ public class Isochrone {
 				
 			}
 			
-			isochrones.add(ConvexHull.convexHull(isochrone));
+			isochrones.add(ConvexHullBuilder.convexHull(isochrone));
 		
 		}
 		
