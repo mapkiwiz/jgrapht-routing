@@ -1,9 +1,13 @@
 package fr.gouv.agriculture.graph;
 
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -19,13 +23,23 @@ public class EdgeListGraphLoader {
 	private int edges = 0;
 	private long loadingTime = 0;
 	
+	private Reader getReader(String filename) throws IOException {
+		if (filename.endsWith(".gz")) {
+			FileInputStream in = new FileInputStream(filename);
+			GZIPInputStream gis = new GZIPInputStream(in);
+			return new InputStreamReader(gis);
+		} else {
+			return new FileReader(filename);
+		}
+	}
+	
 	public SimpleWeightedGraph<Node, DefaultWeightedEdge> loadGraph(String nodeFile, String edgeFile)
 			throws IOException {
 				
 		CSVFormat format = CSVFormat.newFormat('\t').withSkipHeaderRecord(true);
 		long start = System.currentTimeMillis();
 		
-		FileReader reader = new FileReader(nodeFile);
+		Reader reader = getReader(nodeFile);
 		Iterable<CSVRecord> records = format.withHeader("ID", "LON", "LAT").parse(reader);
 		for (CSVRecord record : records) {
 			Node node = asNode(record);
@@ -34,7 +48,7 @@ public class EdgeListGraphLoader {
 		}
 		reader.close();
 		
-		reader = new FileReader(edgeFile);
+		reader = getReader(edgeFile);
 		records = format.withHeader("SOURCE", "TARGET", "WEIGHT", "DATA").parse(reader);
 		for (CSVRecord record : records) {
 			int source = Integer.parseInt(record.get("SOURCE"));

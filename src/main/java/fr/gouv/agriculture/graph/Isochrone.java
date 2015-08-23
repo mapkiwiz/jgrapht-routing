@@ -1,9 +1,11 @@
 package fr.gouv.agriculture.graph;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.jgrapht.Graph;
+import org.jgrapht.traverse.ClosestFirstIterator;
 
 import fr.gouv.agriculture.geojson.Polygon;
 
@@ -16,6 +18,50 @@ public class Isochrone {
 		List<Node> nodes = ShortestPath.searchByDistance(graph, source, distance);
 		List<Node> convexHull = ConvexHull.convexHull(nodes);
 		return convexHull;
+		
+	}
+	
+	public static <E> List<List<Node>> isochrones(Graph<Node, E> graph, Node source, double... distances) {
+		
+		for (double distance : distances) {
+			assert(distance > 0);
+		}
+		
+		Arrays.sort(distances);
+		
+		ClosestFirstIterator<Node, E> iterator =
+				new ClosestFirstIterator<Node, E>(graph, source);
+		
+		List<List<Node>> isochrones = new ArrayList<List<Node>>();
+		Node currentNode = null;
+		
+		for (int k = 0; k < distances.length; k++) {
+			
+			double distance = distances[k];
+			
+			List<Node> isochrone = new ArrayList<Node>();
+			if (currentNode != null) {
+				isochrone.add(currentNode);
+			}
+			
+			while (iterator.hasNext()) {
+				
+				currentNode = iterator.next();
+				double currentDistance = iterator.getShortestPathLength(currentNode);
+				
+				if (currentDistance > distance) {
+					break;
+				}
+				
+				isochrone.add(currentNode);
+				
+			}
+			
+			isochrones.add(ConvexHull.convexHull(isochrone));
+		
+		}
+		
+		return isochrones;
 		
 	}
 	

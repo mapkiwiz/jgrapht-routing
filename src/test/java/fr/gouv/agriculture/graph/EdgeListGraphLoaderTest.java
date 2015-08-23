@@ -26,6 +26,23 @@ public class EdgeListGraphLoaderTest {
 	}
 	
 	@Test
+	public void testLoadGraphGZip() throws IOException {
+		
+		String nodeFile = getClass().getClassLoader().getResource("bdtopo.nodes.tsv.gz").getFile();
+		String edgeFile = getClass().getClassLoader().getResource("bdtopo.edges.tsv.gz").getFile();
+		EdgeListGraphLoader graphLoader = new EdgeListGraphLoader();
+		graphLoader.loadGraph(nodeFile, edgeFile);
+		
+		System.out.println("Loaded " + graphLoader.getNumberOfNodes() + " nodes.");
+		System.out.println("Loaded " + graphLoader.getNumberOfEdges() + " edges.");
+		System.out.println("Loading took " + graphLoader.getLoadingTimeSeconds() + " s.");
+		
+		assertEquals(280305, graphLoader.getNumberOfNodes());
+		assertEquals(307083, graphLoader.getNumberOfEdges());
+		
+	}
+	
+	@Test
 	public void testShortestPath() throws IOException {
 		
 		EdgeListGraphLoader loader = GraphTestUtils.getTestGraph();

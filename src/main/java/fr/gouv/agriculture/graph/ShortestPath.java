@@ -27,7 +27,7 @@ public class ShortestPath {
 
 	}
 
-	public static <V,E> List<V> shortestPath(Graph<V,E> graph, V source, V target) {
+	public static <V,E> Path<V> shortestPath(Graph<V,E> graph, V source, V target) {
 
 		ClosestFirstIterator<V, E> forwardIterator =
 				new ClosestFirstIterator<V, E>(graph, source);
@@ -63,36 +63,38 @@ public class ShortestPath {
 
 		if (middlePoint != null) {
 
-			List<V> path = getShortestPath(graph, forwardIterator, source, middlePoint);
-			path.remove(0);
-			Collections.reverse(path);
-			List<V> reversePath = getShortestPath(graph, reverseIterator, target, middlePoint);
-			path.addAll(reversePath);
+			Path<V> path = getShortestPath(graph, forwardIterator, source, middlePoint);
+			path.elements.remove(0);
+			Collections.reverse(path.elements);
+			Path<V> reversePath = getShortestPath(graph, reverseIterator, target, middlePoint);
+			path.elements.addAll(reversePath.elements);
 
 			return path;
 
 		} else {
 
-			return Collections.emptyList();
+			return new Path<V>();
 
 		}
 
 	}
 
-	public static <V,E> List<V> getShortestPath(Graph<V,E> graph, ClosestFirstIterator<V, E> iterator, V source, V target) {
+	private static <V,E> Path<V> getShortestPath(Graph<V,E> graph, ClosestFirstIterator<V, E> iterator, V source, V target) {
 
-		List<V> nodes = new ArrayList<V>();
+		Path<V> path = new Path<V>();
 
 		V currentNode = target;
-		nodes.add(currentNode);
+		path.elements.add(new PathElement<V>(currentNode, 0.0, 0.0));
 
 		while (!currentNode.equals(source)) {
 			E edge = iterator.getSpanningTreeEdge(currentNode);
+			double weight = graph.getEdgeWeight(edge);
+			double distance = weight;
 			currentNode = getOtherNodeOfEdge(graph, edge, currentNode);
-			nodes.add(currentNode);
+			path.elements.add(new PathElement<V>(currentNode, distance, weight));
 		}
 
-		return nodes;
+		return path;
 
 	}
 

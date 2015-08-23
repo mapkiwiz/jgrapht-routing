@@ -63,14 +63,14 @@ public class ShortestPathTest {
 		Node target = graphLoader.getNodes().get(256987);
 		
 		long start = System.currentTimeMillis();
-		List<Node> path = ShortestPath.shortestPath(graph, source, target);
+		Path<Node> path = ShortestPath.shortestPath(graph, source, target);
 		long duration = System.currentTimeMillis() - start;
 		
 		System.out.println("Duration : " + (duration / 1000.0));
-		assertTrue("Path has not null length", path.size() > 0);
+		assertTrue("Path has not null length", path.elements.size() > 0);
 		
 		List<List<Double>> coordinates = new ArrayList<List<Double>>();
-		for (Node node : path) {
+		for (Node node : path.getNodeList()) {
 			coordinates.add(node.asCoordinatePair());
 		}
 		
@@ -82,7 +82,7 @@ public class ShortestPathTest {
 		feature.properties.put("target", target.id);
 		System.out.println(feature.toGeoJSON());
 		
-		System.out.println("Path length : " + path.size());
+		System.out.println("Path length : " + path.elements.size());
 		
 	}
 

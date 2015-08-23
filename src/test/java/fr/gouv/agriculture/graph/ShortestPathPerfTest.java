@@ -13,8 +13,10 @@ public class ShortestPathPerfTest {
 	@Test
 	public void testBidirectionalShortestPathPerf() throws IOException {
 		
+		String nodeFile = getClass().getClassLoader().getResource("bdtopo.nodes.tsv.gz").getFile();
+		String edgeFile = getClass().getClassLoader().getResource("bdtopo.edges.tsv.gz").getFile();
 		EdgeListGraphLoader graphLoader = new EdgeListGraphLoader();
-		Graph<Node, DefaultWeightedEdge> graph = graphLoader.loadGraph("/tmp/bdtopo.nodes.tsv", "/tmp/bdtopo.edges.tsv");
+		Graph<Node, DefaultWeightedEdge> graph = graphLoader.loadGraph(nodeFile, edgeFile);
 		
 		Node source = graphLoader.getNodes().get(24951);
 		Node target = graphLoader.getNodes().get(256987);
@@ -28,7 +30,7 @@ public class ShortestPathPerfTest {
 			avgDuration = (i * avgDuration + duration) / (i+1);
 		}
 		
-		System.out.println("Average Duration : " + (avgDuration / 1000.0));
+		System.out.println("BidirectionalShortestPath Average Duration : " + (avgDuration / 1000.0));
 		
 		
 	}
@@ -36,8 +38,10 @@ public class ShortestPathPerfTest {
 	@Test
 	public void testShortestPathPerf() throws IOException {
 		
+		String nodeFile = getClass().getClassLoader().getResource("bdtopo.nodes.tsv.gz").getFile();
+		String edgeFile = getClass().getClassLoader().getResource("bdtopo.edges.tsv.gz").getFile();
 		EdgeListGraphLoader graphLoader = new EdgeListGraphLoader();
-		Graph<Node, DefaultWeightedEdge> graph = graphLoader.loadGraph("/tmp/bdtopo.nodes.tsv", "/tmp/bdtopo.edges.tsv");
+		Graph<Node, DefaultWeightedEdge> graph = graphLoader.loadGraph(nodeFile, edgeFile);
 		
 		Node source = graphLoader.getNodes().get(24951);
 		Node target = graphLoader.getNodes().get(256987);
@@ -51,7 +55,33 @@ public class ShortestPathPerfTest {
 			avgDuration = (i * avgDuration + duration) / (i+1);
 		}
 		
-		System.out.println("Average Duration : " + (avgDuration / 1000.0));
+		System.out.println("ShortestPathLength Average Duration : " + (avgDuration / 1000.0));
+		
+		
+	}
+	
+	@Test
+	public void testShortestPathPathPerf() throws IOException {
+		
+		String nodeFile = getClass().getClassLoader().getResource("bdtopo.nodes.tsv.gz").getFile();
+		String edgeFile = getClass().getClassLoader().getResource("bdtopo.edges.tsv.gz").getFile();
+		EdgeListGraphLoader graphLoader = new EdgeListGraphLoader();
+		Graph<Node, DefaultWeightedEdge> graph = graphLoader.loadGraph(nodeFile, edgeFile);
+		
+		Node source = graphLoader.getNodes().get(24951);
+		Node target = graphLoader.getNodes().get(256987);
+		
+		long avgDuration = 0;
+		for (int i=0; i<100; i++) {
+			long start = System.currentTimeMillis();
+			Path<Node> path = ShortestPath.shortestPath(graph, source, target);
+			double distance = path.getTotalDistance();
+			long duration = System.currentTimeMillis() - start;
+			assertTrue("Path has not null length", distance > 0);
+			avgDuration = (i * avgDuration + duration) / (i+1);
+		}
+		
+		System.out.println("ShortestPathPath Average Duration : " + (avgDuration / 1000.0));
 		
 		
 	}
