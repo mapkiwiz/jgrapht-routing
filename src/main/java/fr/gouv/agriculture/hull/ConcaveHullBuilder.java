@@ -3,18 +3,32 @@ package fr.gouv.agriculture.hull;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.davidmoten.rtree.Entry;
-import com.github.davidmoten.rtree.RTree;
-import com.github.davidmoten.rtree.geometry.Point;
-
 import fr.gouv.agriculture.geojson.Polygon;
 import fr.gouv.agriculture.graph.Node;
 import fr.gouv.agriculture.graph.utils.NodeUtils;
+import fr.gouv.agriculture.index.quadtree.QuadTree;
 
 public class ConcaveHullBuilder implements HullBuilder {
 	
 	private long duration_index;
 	private long duration_hull;
+	private int maxIteration;
+	
+	public ConcaveHullBuilder() {
+		this.maxIteration = 2;
+	}
+	
+	public ConcaveHullBuilder(int maxIteration) {
+		this.maxIteration = maxIteration;
+	}
+	
+	public void setMaxIteration(int maxIteration) {
+		this.maxIteration = maxIteration;
+	}
+	
+	public int getMaxIteration() {
+		return this.maxIteration;
+	}
 
 	public Polygon buildHull(List<Node> nodes) {
 		
@@ -24,37 +38,51 @@ public class ConcaveHullBuilder implements HullBuilder {
 		
 		long start = System.currentTimeMillis();
 		
-		RTree<Node, Point> rtree = RTree.create(); //.minChildren(3).maxChildren(6).create();
-		for (Node node : nodes) {
-			Point p = Point.create(node.lon, node.lat);
-			rtree = rtree.add(node, p);
+		QuadTree<Node> tree = new QuadTree<Node>(-180.0, -90.0, 180.0, 90.0);
+		for (Node n : nodes) {
+			tree.set(n.lon, n.lat, n);
 		}
 		
 		duration_index = System.currentTimeMillis() - start;
 		
-		List<Node> result = new ArrayList<Node>();
 		List<Node> convexHull = ConvexHullBuilder.convexHull(nodes);
-		double convexHullLength = NodeUtils.length(convexHull);
-		double maxSegmentLength = convexHullLength / Math.min(2 * convexHull.size(), 1000);
-		double searchDistance = convexHullLength / Math.PI / 4;
+		List<Node> concaveHull = convexHull;
+		int i = 0;
+		int numberOfNodes;
+		int currentNumberOfNodes = concaveHull.size()-1;
 		
-		for (Double[] p : segmentize(convexHull, maxSegmentLength)) {
-			List<Entry<Node, Point>> r = rtree.nearest(Point.create(p[0], p[1]), searchDistance, 1)
-					.toList()
-					.toBlocking()
-					.single();
-			if (!r.isEmpty()) {
-				Node n = r.get(0).value();
-				result.add(n);
+		while (i++ < maxIteration && (numberOfNodes = concaveHull.size()) > currentNumberOfNodes) {
+			currentNumberOfNodes = numberOfNodes;
+			concaveHull = refine(concaveHull, tree);
+		}
+		
+		duration_hull = System.currentTimeMillis() - start - duration_index;
+//		System.out.println("Iterations : " + (i-1));
+		
+		return NodeUtils.asPolygon(concaveHull);
+		
+	}
+	
+	private List<Node> refine(List<Node> ring, QuadTree<Node> tree) {
+		
+		double convexHullLength = NodeUtils.length(ring);
+		double maxSegmentLength = convexHullLength / Math.min(2 * ring.size(), 1000);
+		double searchDistance = convexHullLength / ring.size() * 2;
+//		System.out.println("Search distance : " + searchDistance);
+		
+		List<Node> result = new ArrayList<Node>();
+		
+		for (Double[] p : segmentize(ring, maxSegmentLength)) {
+			Node nearest = tree.nearest(p[0], p[1], searchDistance);
+			if (nearest != null) {
+				result.add(nearest);
 			}
 			
 		}
 		
-		result.add(convexHull.get(0));
+		result.add(ring.get(0));
 		
-		duration_hull = System.currentTimeMillis() - start - duration_index;
-		
-		return NodeUtils.asPolygon(result);
+		return result;
 		
 	}
 	
