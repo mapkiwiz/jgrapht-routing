@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import fr.gouv.agriculture.test.AbstractHsqlDbTest;
 
-public class DataSourceEdgeListGraphLoaderTest extends AbstractHsqlDbTest {
+public class JdbcEdgeListGraphLoaderTest extends AbstractHsqlDbTest {
 	
 	@Test
 	public void testLoadGraph() throws IOException {
@@ -20,8 +20,8 @@ public class DataSourceEdgeListGraphLoaderTest extends AbstractHsqlDbTest {
 		String edgeTemplateQuery =
 				"SELECT source, target, weight FROM edges ORDER BY source, target";
 		
-		DataSourceEdgeListGraphLoader loader =
-				new DataSourceEdgeListGraphLoader(
+		JdbcEdgeListGraphLoader loader =
+				new JdbcEdgeListGraphLoader(
 						dataSource,
 						nodeTemplateQuery,
 						edgeTemplateQuery);

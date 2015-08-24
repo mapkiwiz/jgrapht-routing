@@ -29,11 +29,11 @@ public abstract class AbstractHsqlDbTest {
 		File container = new File(nodeFilename).getParentFile();
 		assertTrue(container.isDirectory());
 		
-		File nodeFile = new File(container, "hsqldb.node.tsv");
+		File nodeFile = new File(container, "hsqldb.nodes.tsv");
 		if (!nodeFile.exists()) {
 			gunzip(nodeFilename, nodeFile.getAbsolutePath());
 		}
-		File edgeFile = new File(container, "hsqldb.edge.tsv");
+		File edgeFile = new File(container, "hsqldb.edges.tsv");
 		if (!edgeFile.exists()) {
 			gunzip(edgeFilename, edgeFile.getAbsolutePath());
 		}
@@ -47,9 +47,9 @@ public abstract class AbstractHsqlDbTest {
 		template = new JdbcTemplate(dataSource);
 //		template.execute("SET DATABASE TEXT TABLE DEFAULTS 'allow_full_path=true'");
 		template.execute("CREATE TEXT TABLE nodes (id integer, lon integer, lat integer)");
-		template.execute("SET TABLE nodes SOURCE 'hsqldb.node.tsv;fs=\\t;ignore_first=true' DESC");
+		template.execute("SET TABLE nodes SOURCE 'hsqldb.nodes.tsv;fs=\\t;ignore_first=true' DESC");
 		template.execute("CREATE TEXT TABLE edges (source integer, target integer, weight double precision, data integer)");
-		template.execute("SET TABLE edges SOURCE 'hsqldb.edge.tsv;fs=\\t;ignore_first=true' DESC");
+		template.execute("SET TABLE edges SOURCE 'hsqldb.edges.tsv;fs=\\t;ignore_first=true' DESC");
 		
 	}
 	

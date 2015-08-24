@@ -14,13 +14,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
 
-public class DataSourceEdgeListGraphLoader extends AbstractEdgeListGraphLoader {
+public class JdbcEdgeListGraphLoader extends AbstractEdgeListGraphLoader {
 
 	private final DataSource dataSource;
 	private final String nodeTemplateQuery;
 	private final String edgeTemplateQuery;
 
-	public DataSourceEdgeListGraphLoader(DataSource dataSource, String nodeTemplateQuery, String edgeTemplateQuery) {
+	public JdbcEdgeListGraphLoader(DataSource dataSource, String nodeTemplateQuery, String edgeTemplateQuery) {
 		this.dataSource = dataSource;
 		this.nodeTemplateQuery = nodeTemplateQuery;
 		this.edgeTemplateQuery = edgeTemplateQuery;

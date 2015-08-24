@@ -15,7 +15,7 @@
 	    <spring.security.oauth.version>2.0.7.RELEASE</spring.security.oauth.version>
 	    <angular.version>1.3.15</angular.version>
 	    <java.version>1.6</java.version>
-	    <m2eclipse.wtp.contextRoot>/telepoc</m2eclipse.wtp.contextRoot>
+	    <m2eclipse.wtp.contextRoot>/routing</m2eclipse.wtp.contextRoot>
 	</properties>
 
 	<profiles>
@@ -28,7 +28,7 @@
 				        <artifactId>tomcat7-maven-plugin</artifactId>
 				        <version>2.2</version>
 				        <configuration>
-				          <path>/telepoc</path>
+				          <path>/routing</path>
 						  <fork>false</fork>
 				          <systemProperties>
 				            <JAVA_OPTS>-Xmx1024m -Xms256m -XX:MaxPermSize=256m -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000</JAVA_OPTS>
@@ -72,7 +72,7 @@
 									<goal>run</goal>
 								</goals>
 								<configuration>
-									<path>/telepoc</path>
+									<path>/routing</path>
 									<fork>true</fork>
 								</configuration>
 							</execution>
@@ -105,7 +105,7 @@
 					<groupId>org.apache.tomcat.maven</groupId>
 					<artifactId>tomcat7-maven-plugin</artifactId>
 					<configuration>
-						<path>/telepoc</path>
+						<path>/routing</path>
 					</configuration>
 			</plugin>
 		</plugins>
@@ -114,9 +114,10 @@
 				<plugin>
 					<groupId>org.apache.tomcat.maven</groupId>
 					<artifactId>tomcat7-maven-plugin</artifactId>
-					<configuration>
+					<version>2.2</version>
+					<!-- <configuration>
 						<addContextWarDependencies>true</addContextWarDependencies>
-					</configuration>
+					</configuration> -->
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -149,6 +150,24 @@
 	</repositories>
 
 	<dependencies>
+	
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.2</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>1.7.2</version>
+		</dependency>
+		
+		<!-- <dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+			<version>1.7.2</version>
+		</dependency> -->
 
 		<dependency>
 			<groupId>org.springframework</groupId>

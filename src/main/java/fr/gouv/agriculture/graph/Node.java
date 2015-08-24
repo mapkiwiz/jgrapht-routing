@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.gouv.agriculture.geojson.Point;
+
 public class Node implements Serializable {
 	
 	/**
