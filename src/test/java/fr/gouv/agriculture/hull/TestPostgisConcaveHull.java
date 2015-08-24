@@ -10,34 +10,22 @@ import javax.sql.DataSource;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.junit.Test;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import fr.gouv.agriculture.geojson.Polygon;
 import fr.gouv.agriculture.graph.EdgeListGraphLoader;
 import fr.gouv.agriculture.graph.GraphTestUtils;
 import fr.gouv.agriculture.graph.Isochrone;
 import fr.gouv.agriculture.graph.Node;
-import fr.gouv.agriculture.hull.PostgisConcaveHullBuilder;
+import fr.gouv.agriculture.test.DatabaseTestHelper;
 
 public class TestPostgisConcaveHull {
 	
-	public DataSource getDataSource() {
-		
-		String url = "jdbc:postgresql://localhost:5432/refgeo";
-		DriverManagerDataSource dataSource =
-				new DriverManagerDataSource(url);
-		dataSource.setDriverClassName("org.postgresql.Driver");
-		dataSource.setUsername("refgeo");
-		dataSource.setPassword("refgeo");
-		
-		return dataSource;
-		
-	}
+	
 	
 	@Test
 	public void testPostgisConcaveHull() throws IOException {
 		
-		DataSource dataSource = getDataSource();
+		DataSource dataSource = DatabaseTestHelper.getDataSource();
 		
 		String nodeFile = getClass().getClassLoader().getResource("bdtopo.nodes.tsv.gz").getFile();
 		String edgeFile = getClass().getClassLoader().getResource("bdtopo.edges.tsv.gz").getFile();
