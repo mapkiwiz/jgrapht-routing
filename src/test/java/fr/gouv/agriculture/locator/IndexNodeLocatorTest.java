@@ -1,25 +1,24 @@
 package fr.gouv.agriculture.locator;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultWeightedEdge;
 import org.junit.Test;
 
-import fr.gouv.agriculture.graph.EdgeListGraphLoader;
+import fr.gouv.agriculture.graph.AbstractGraphTest;
 import fr.gouv.agriculture.graph.Node;
 
-public class IndexNodeLocatorTest {
+public class IndexNodeLocatorTest extends AbstractGraphTest {
 	
 	@Test
 	public void testLocate() throws IOException {
 		
-		String nodeFile = getClass().getClassLoader().getResource("bdtopo.nodes.tsv.gz").getFile();
-		String edgeFile = getClass().getClassLoader().getResource("bdtopo.edges.tsv.gz").getFile();
-		EdgeListGraphLoader loader = new EdgeListGraphLoader();
-		loader.loadGraph(nodeFile, edgeFile);
-		IndexNodeLocator locator = new IndexNodeLocator(loader.getGraph().vertexSet());
+		Graph<Node, DefaultWeightedEdge> graph = loadLargeGraph();
+		IndexNodeLocator locator = new IndexNodeLocator(graph.vertexSet());
 		/*  id    |       lon        |       lat        
 			-------+------------------+------------------
  			24951 | 4.83441389858932 | 45.7673043893699
@@ -32,7 +31,7 @@ public class IndexNodeLocatorTest {
 		long duration = System.currentTimeMillis() - start;
 		
 		assertNotNull(node);
-		assertEquals(24951, node.id);
+		assertTrue(24951L == node.id);
 		
 		System.out.println(node);
 		System.out.println("Duration : " + (duration / 1000.0));

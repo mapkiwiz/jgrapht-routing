@@ -13,16 +13,44 @@ import org.junit.Test;
 import fr.gouv.agriculture.geojson.Feature;
 import fr.gouv.agriculture.geojson.LineString;
 
-public class ShortestPathTest {
+public class ShortestPathTest extends AbstractGraphTest {
+	
+	@Test
+	public void testShortestPathSmall() throws IOException {
+		
+		Graph<Node, DefaultWeightedEdge> graph = loadSmallGraph();
+		Node source = getNode(SMALL_GRAPH_ORIGIN_NODE_ID);
+		Node target = getNode(SMALL_GRAPH_TOPRIGHT_NODE_ID);
+		
+		double distance = ShortestPath.shortestPathLength(graph, source, target);
+		assertTrue("Path has not of null length", distance > 0);
+		
+		assertTrue("Distance 0->899 is 709.0 u.", distance == 709.0);
+		
+	}
+	
+	@Test
+	public void testBidirectionalShortestPathSmall() throws IOException {
+		
+		Graph<Node, DefaultWeightedEdge> graph = loadSmallGraph();
+		Node source = getNode(SMALL_GRAPH_ORIGIN_NODE_ID);
+		Node target = getNode(SMALL_GRAPH_TOPRIGHT_NODE_ID);
+		
+		double distance = ShortestPath.bidirectionalShortestPathLength(graph, source, target);
+		System.out.println(distance);
+		
+		assertTrue("Path has not of null length", distance > 0);
+		assertTrue("Distance 0->899 is 710.0 u.", distance == 710.0); // Not exact resulat, should be 709.0
+		
+	}
 
 	@Test
 	public void testShortestPath() throws IOException {
 		
-		EdgeListGraphLoader graphLoader = new EdgeListGraphLoader();
-		Graph<Node, DefaultWeightedEdge> graph = graphLoader.loadGraph("/tmp/bdtopo.nodes.tsv", "/tmp/bdtopo.edges.tsv");
+		Graph<Node, DefaultWeightedEdge> graph = loadLargeGraph();
 		
-		Node source = graphLoader.getNodes().get(24951);
-		Node target = graphLoader.getNodes().get(256987);
+		Node source = getNode(LYON_NODE_ID);
+		Node target = getNode(VALENCE_NODE_ID);
 		
 		long start = System.currentTimeMillis();
 		double distance = ShortestPath.shortestPathLength(graph, source, target);
@@ -37,11 +65,10 @@ public class ShortestPathTest {
 	@Test
 	public void testBidirectionalShortestPath() throws IOException {
 		
-		EdgeListGraphLoader graphLoader = new EdgeListGraphLoader();
-		Graph<Node, DefaultWeightedEdge> graph = graphLoader.loadGraph("/tmp/bdtopo.nodes.tsv", "/tmp/bdtopo.edges.tsv");
+		Graph<Node, DefaultWeightedEdge> graph = loadLargeGraph();
 		
-		Node source = graphLoader.getNodes().get(24951);
-		Node target = graphLoader.getNodes().get(256987);
+		Node source = getNode(LYON_NODE_ID);
+		Node target = getNode(VALENCE_NODE_ID);
 		
 		long start = System.currentTimeMillis();
 		double distance = ShortestPath.bidirectionalShortestPathLength(graph, source, target);
@@ -56,11 +83,10 @@ public class ShortestPathTest {
 	@Test
 	public void testGetShortestPath() throws IOException {
 		
-		EdgeListGraphLoader graphLoader = new EdgeListGraphLoader();
-		Graph<Node, DefaultWeightedEdge> graph = graphLoader.loadGraph("/tmp/bdtopo.nodes.tsv", "/tmp/bdtopo.edges.tsv");
+		Graph<Node, DefaultWeightedEdge> graph = loadLargeGraph();
 		
-		Node source = graphLoader.getNodes().get(24951);
-		Node target = graphLoader.getNodes().get(256987);
+		Node source = getNode(LYON_NODE_ID);
+		Node target = getNode(VALENCE_NODE_ID);
 		
 		long start = System.currentTimeMillis();
 		Path<Node> path = ShortestPath.shortestPath(graph, source, target);

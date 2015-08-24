@@ -13,16 +13,16 @@ import fr.gouv.agriculture.geojson.Feature;
 import fr.gouv.agriculture.geojson.FeatureCollection;
 import fr.gouv.agriculture.geojson.Polygon;
 
-public class IsochroneTest {
+public class IsochroneTest extends AbstractGraphTest {
 
 	@Test
 	public void testIsochroneOnTestGraph() throws IOException {
 		
-		EdgeListGraphLoader graphLoader = GraphTestUtils.getTestGraph();
-		Node source = graphLoader.getNodes().get(0);
+		Graph<Node, DefaultWeightedEdge> graph = loadSmallGraph();
+		Node source =getNode(0L);
 		double distance = 300.0;
 		
-		List<Node> isochrone = Isochrone.isochrone(graphLoader.getGraph(), source, distance);
+		List<Node> isochrone = Isochrone.isochrone(graph, source, distance);
 		
 		assertTrue("Isochrone has not null length", isochrone.size() > 0);
 		
@@ -37,13 +37,10 @@ public class IsochroneTest {
 	@Test
 	public void testIsochrone() throws IOException {
 		
-		String nodeFile = getClass().getClassLoader().getResource("bdtopo.nodes.tsv.gz").getFile();
-		String edgeFile = getClass().getClassLoader().getResource("bdtopo.edges.tsv.gz").getFile();
-		EdgeListGraphLoader graphLoader = new EdgeListGraphLoader();
-		Graph<Node, DefaultWeightedEdge> graph = graphLoader.loadGraph(nodeFile, edgeFile);
+		Graph<Node, DefaultWeightedEdge> graph = loadLargeGraph();
 		
-//		Node source = graphLoader.getNodes().get(24951);
-		Node source = graphLoader.getNodes().get(256987);
+//		Node source = getNode(LYON_NODE_ID);
+		Node source = getNode(VALENCE_NODE_ID);
 		double distance = 30000.0; // 30 km
 		
 		long start = System.currentTimeMillis();
@@ -67,13 +64,10 @@ public class IsochroneTest {
 	@Test
 	public void testIsochrones() throws IOException {
 		
-		String nodeFile = getClass().getClassLoader().getResource("bdtopo.nodes.tsv.gz").getFile();
-		String edgeFile = getClass().getClassLoader().getResource("bdtopo.edges.tsv.gz").getFile();
-		EdgeListGraphLoader graphLoader = new EdgeListGraphLoader();
-		Graph<Node, DefaultWeightedEdge> graph = graphLoader.loadGraph(nodeFile, edgeFile);
+		Graph<Node, DefaultWeightedEdge> graph = loadLargeGraph();
 		
-//		Node source = graphLoader.getNodes().get(24951);
-		Node source = graphLoader.getNodes().get(256987);
+//		Node source = getNode(LYON_NODE_ID);
+		Node source = getNode(VALENCE_NODE_ID);
 		double[] distances = { 10000.0, 20000.0, 30000.0 };
 		
 		long start = System.currentTimeMillis();

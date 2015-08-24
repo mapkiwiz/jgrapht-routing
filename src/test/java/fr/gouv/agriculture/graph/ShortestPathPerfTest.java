@@ -7,19 +7,21 @@ import java.io.IOException;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
-public class ShortestPathPerfTest {
+import fr.gouv.agriculture.test.PerformanceTest;
+
+@PerformanceTest
+@Category(PerformanceTest.class)
+public class ShortestPathPerfTest extends AbstractGraphTest {
 
 	@Test
 	public void testBidirectionalShortestPathPerf() throws IOException {
 		
-		String nodeFile = getClass().getClassLoader().getResource("bdtopo.nodes.tsv.gz").getFile();
-		String edgeFile = getClass().getClassLoader().getResource("bdtopo.edges.tsv.gz").getFile();
-		EdgeListGraphLoader graphLoader = new EdgeListGraphLoader();
-		Graph<Node, DefaultWeightedEdge> graph = graphLoader.loadGraph(nodeFile, edgeFile);
+		Graph<Node, DefaultWeightedEdge> graph = loadLargeGraph();
 		
-		Node source = graphLoader.getNodes().get(24951);
-		Node target = graphLoader.getNodes().get(256987);
+		Node source = getNode(LYON_NODE_ID);
+		Node target = getNode(VALENCE_NODE_ID);
 		
 		long avgDuration = 0;
 		for (int i=0; i<100; i++) {
@@ -38,13 +40,10 @@ public class ShortestPathPerfTest {
 	@Test
 	public void testShortestPathPerf() throws IOException {
 		
-		String nodeFile = getClass().getClassLoader().getResource("bdtopo.nodes.tsv.gz").getFile();
-		String edgeFile = getClass().getClassLoader().getResource("bdtopo.edges.tsv.gz").getFile();
-		EdgeListGraphLoader graphLoader = new EdgeListGraphLoader();
-		Graph<Node, DefaultWeightedEdge> graph = graphLoader.loadGraph(nodeFile, edgeFile);
+		Graph<Node, DefaultWeightedEdge> graph = loadLargeGraph();
 		
-		Node source = graphLoader.getNodes().get(24951);
-		Node target = graphLoader.getNodes().get(256987);
+		Node source = getNode(LYON_NODE_ID);
+		Node target = getNode(VALENCE_NODE_ID);
 		
 		long avgDuration = 0;
 		for (int i=0; i<100; i++) {
@@ -63,13 +62,10 @@ public class ShortestPathPerfTest {
 	@Test
 	public void testShortestPathPathPerf() throws IOException {
 		
-		String nodeFile = getClass().getClassLoader().getResource("bdtopo.nodes.tsv.gz").getFile();
-		String edgeFile = getClass().getClassLoader().getResource("bdtopo.edges.tsv.gz").getFile();
-		EdgeListGraphLoader graphLoader = new EdgeListGraphLoader();
-		Graph<Node, DefaultWeightedEdge> graph = graphLoader.loadGraph(nodeFile, edgeFile);
+		Graph<Node, DefaultWeightedEdge> graph = loadLargeGraph();
 		
-		Node source = graphLoader.getNodes().get(24951);
-		Node target = graphLoader.getNodes().get(256987);
+		Node source = getNode(LYON_NODE_ID);
+		Node target = getNode(VALENCE_NODE_ID);
 		
 		long avgDuration = 0;
 		for (int i=0; i<100; i++) {

@@ -1,13 +1,19 @@
 package fr.gouv.agriculture.locator;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import javax.sql.DataSource;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import fr.gouv.agriculture.graph.Node;
 import fr.gouv.agriculture.test.DatabaseTestHelper;
-import static org.junit.Assert.*;
+import fr.gouv.agriculture.test.PostgisTest;
 
+@PostgisTest
+@Category(PostgisTest.class)
 public class DatabaseNodeLocatorTest {
 	
 	@Test
@@ -28,7 +34,7 @@ public class DatabaseNodeLocatorTest {
 		long duration = System.currentTimeMillis() - start;
 		
 		assertNotNull(node);
-		assertEquals(24951, node.id);
+		assertTrue(24951L == node.id);
 		
 		System.out.println(node);
 		System.out.println("Duration : " + (duration / 1000.0));

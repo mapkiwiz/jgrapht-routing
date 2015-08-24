@@ -10,28 +10,26 @@ import javax.sql.DataSource;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import fr.gouv.agriculture.geojson.Polygon;
-import fr.gouv.agriculture.graph.EdgeListGraphLoader;
-import fr.gouv.agriculture.graph.GraphTestUtils;
+import fr.gouv.agriculture.graph.AbstractGraphTest;
 import fr.gouv.agriculture.graph.Isochrone;
 import fr.gouv.agriculture.graph.Node;
 import fr.gouv.agriculture.test.DatabaseTestHelper;
+import fr.gouv.agriculture.test.PostgisTest;
 
-public class TestPostgisConcaveHull {
-	
-	
+@PostgisTest
+@Category(PostgisTest.class)
+public class TestPostgisConcaveHull extends AbstractGraphTest {
 	
 	@Test
 	public void testPostgisConcaveHull() throws IOException {
 		
 		DataSource dataSource = DatabaseTestHelper.getDataSource();
 		
-		String nodeFile = getClass().getClassLoader().getResource("bdtopo.nodes.tsv.gz").getFile();
-		String edgeFile = getClass().getClassLoader().getResource("bdtopo.edges.tsv.gz").getFile();
-		EdgeListGraphLoader loader = new EdgeListGraphLoader();
-		Graph<Node, DefaultWeightedEdge> graph = loader.loadGraph(nodeFile, edgeFile);
-		Node source = loader.getNodes().get(GraphTestUtils.GRENOBLE_NODE_ID);
+		Graph<Node, DefaultWeightedEdge> graph = loadLargeGraph();
+		Node source = getNode(GRENOBLE_NODE_ID);
 		double distance = 50000.0;
 		List<Node> isochrone = Isochrone.isochroneRaw(graph, source, distance);
 
