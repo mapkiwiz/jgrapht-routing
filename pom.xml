@@ -108,9 +108,7 @@
 					<artifactId>tomcat7-maven-plugin</artifactId>
 					<configuration>
 						<path>/routing</path>
-						<!-- <serverXml>src/main/resources/server.xml</serverXml> -->
-						<!-- <useSeparateTomcatClassLoader>true</useSeparateTomcatClassLoader> -->
-						<connectorHttpProtocol>org.apache.coyote.http11.Http11NioProtocol</connectorHttpProtocol>
+						<protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
 						<systemProperties>
 							<JAVA_OPTS>-server -Xmx512m -Xms512m -XX:+AggressiveOpts</JAVA_OPTS>
 						</systemProperties>
@@ -208,7 +206,7 @@
 			<version>${spring.version}</version>
 		</dependency>
 
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-taglibs</artifactId>
 			<version>${spring.security.version}</version>
@@ -218,19 +216,18 @@
 			<groupId>org.springframework.security.oauth</groupId>
 			<artifactId>spring-security-oauth2</artifactId>
 			<version>${spring.security.oauth.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.mitre</groupId>
-			<artifactId>openid-connect-client</artifactId>
-			<version>1.1.10</version>
-			<type>jar</type>
-		</dependency>
+		</dependency> -->
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<version>2.3.1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.2.4</version>
 		</dependency>
 
 		<dependency>
@@ -246,7 +243,7 @@
 			<version>1.2</version>
 		</dependency>
 
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.webjars.bower</groupId>
 			<artifactId>jquery</artifactId>
 			<version>1.11.0</version>
@@ -280,7 +277,7 @@
 			<groupId>org.webjars.bower</groupId>
 			<artifactId>jwt-client</artifactId>
 			<version>0.1.0</version>
-		</dependency>
+		</dependency> -->
 
 		<dependency>
 			<groupId>junit</groupId>
@@ -289,12 +286,12 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<version>4.3.3</version>
 			<scope>test</scope>
-		</dependency>
+		</dependency> -->
 
 		<dependency>
 			<groupId>org.jgrapht</groupId>
@@ -308,11 +305,11 @@
 			<version>1.1</version>
 		</dependency>
 
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.github.davidmoten</groupId>
 			<artifactId>rtree</artifactId>
     		<version>0.6.4</version>
-		</dependency>
+		</dependency> -->
 
 		<dependency>
 			<groupId>org.postgresql</groupId>

@@ -18,6 +18,10 @@ max_lat = 46.4636352867284
 headers = {}
 random_points = {}
 
+-- function startup()
+--    statsd:gauge('client.threads', 0)
+-- end
+
 function init(args)
    math.randomseed(os.time())
    path = args[0]
@@ -32,7 +36,8 @@ function init(args)
       random_points[n] = p
       n = n + 1
     end
-    i = math.random(n)
+    i = math.random(n) -- start at random point in random_points
+    -- statsd:gauge('client.threads', '+1')
 end
 
 function delay()
@@ -66,3 +71,11 @@ function response(status, time, headers, body)
 	statsd:increment('client.status_' .. status, 1)
     end
 end
+
+-- function shutdown()
+--   statsd:gauge('client.threads', '-1')
+-- end
+
+-- function done(summary, latency, requests)
+--   print 'Done'
+-- end

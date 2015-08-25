@@ -8,7 +8,7 @@ DURATION=5m
 SCRIPT=routing.lua
 TIMEOUT=1m
 
-for k in 5
+for k in 1 5 10 15 20 30
 do
     $WRK_BIN -c $k -d $DURATION -t $k -s $SCRIPT --timeout $TIMEOUT $BASE_URL/$METHOD -- $TEST_POINTS
     sleep 10
