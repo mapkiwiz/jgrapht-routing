@@ -26,7 +26,9 @@ public class ShortestPathPerfTest extends AbstractGraphTest {
 		long avgDuration = 0;
 		for (int i=0; i<100; i++) {
 			long start = System.currentTimeMillis();
-			double distance = ShortestPath.bidirectionalShortestPathLength(graph, source, target);
+			ShortestPath shortestPath = new ShortestPath(
+					new PriorityQueueDijkstraIterator.Factory());
+			double distance = shortestPath.bidirectionalShortestPathLength(graph, source, target);
 			long duration = System.currentTimeMillis() - start;
 			assertTrue("Path has not null length", distance > 0);
 			avgDuration = (i * avgDuration + duration) / (i+1);
@@ -48,7 +50,9 @@ public class ShortestPathPerfTest extends AbstractGraphTest {
 		long avgDuration = 0;
 		for (int i=0; i<100; i++) {
 			long start = System.currentTimeMillis();
-			double distance = ShortestPath.shortestPathLength(graph, source, target);
+			ShortestPath shortestPath = new ShortestPath(
+					new PriorityQueueDijkstraIterator.Factory());
+			double distance = shortestPath.shortestPathLength(graph, source, target);
 			long duration = System.currentTimeMillis() - start;
 			assertTrue("Path has not null length", distance > 0);
 			avgDuration = (i * avgDuration + duration) / (i+1);
@@ -70,7 +74,8 @@ public class ShortestPathPerfTest extends AbstractGraphTest {
 		long avgDuration = 0;
 		for (int i=0; i<100; i++) {
 			long start = System.currentTimeMillis();
-			Path<Node> path = ShortestPath.shortestPath(graph, source, target);
+			ShortestPath shortestPath = new ShortestPath(new PriorityQueueDijkstraIterator.Factory());
+			Path<Node> path = shortestPath.shortestPath(graph, source, target);
 			double distance = path.getTotalDistance();
 			long duration = System.currentTimeMillis() - start;
 			assertTrue("Path has not null length", distance > 0);

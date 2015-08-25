@@ -1,21 +1,20 @@
 package fr.gouv.agriculture.graph;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.PriorityQueue;
 
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 
-public class PQClosestFirstIterator<V,E> implements Iterator<V> {
+public class PriorityQueueDijkstraIterator<V,E> implements DijkstraIterator<V> {
 
 	private final PriorityQueue<QueueEntry<V>> heap;
 	private final Graph<V,E> graph;
 	private final Map<V, QueueEntry<V>> seen;
 	private QueueEntry<V> next;
 	
-	public PQClosestFirstIterator(Graph<V,E> graph, V source) {
+	public PriorityQueueDijkstraIterator(Graph<V,E> graph, V source) {
 		
 		this.graph = graph;
 		this.heap = new PriorityQueue<QueueEntry<V>>(graph.vertexSet().size() >>> 1);
@@ -132,6 +131,21 @@ public class PQClosestFirstIterator<V,E> implements Iterator<V> {
 		}
 		
 	}
+	
+	public Path<V> getPath(V vertex) {
+		
+		Path<V> path = new Path<V>();
+
+		PathElement<V> pathElement = new PathElement<V>(vertex, 0.0, 0.0);
+		
+		while (pathElement.node != null) {
+			path.elements.add(pathElement);
+			pathElement = getPathElement(pathElement.node);
+		}
+
+		return path;
+		
+	}
 
 	public void remove() {
 		throw new UnsupportedOperationException();
@@ -161,6 +175,14 @@ public class PQClosestFirstIterator<V,E> implements Iterator<V> {
 			} else {
 				return 0;
 			}
+		}
+		
+	}
+	
+	public static class Factory implements DijsktraIteratorFactory {
+
+		public <V, E> DijkstraIterator<V> create(Graph<V, E> graph, V source) {
+			return new PriorityQueueDijkstraIterator<V, E>(graph, source);
 		}
 		
 	}

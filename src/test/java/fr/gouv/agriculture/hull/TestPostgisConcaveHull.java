@@ -16,6 +16,7 @@ import fr.gouv.agriculture.geojson.Polygon;
 import fr.gouv.agriculture.graph.AbstractGraphTest;
 import fr.gouv.agriculture.graph.Isochrone;
 import fr.gouv.agriculture.graph.Node;
+import fr.gouv.agriculture.graph.PriorityQueueDijkstraIterator;
 import fr.gouv.agriculture.test.DatabaseTestHelper;
 import fr.gouv.agriculture.test.PostgisTest;
 
@@ -31,7 +32,9 @@ public class TestPostgisConcaveHull extends AbstractGraphTest {
 		Graph<Node, DefaultWeightedEdge> graph = loadLargeGraph();
 		Node source = getNode(GRENOBLE_NODE_ID);
 		double distance = 50000.0;
-		List<Node> isochrone = Isochrone.isochroneRaw(graph, source, distance);
+		Isochrone processor =
+				new Isochrone(new PriorityQueueDijkstraIterator.Factory());
+		List<Node> isochrone = processor.isochroneRaw(graph, source, distance);
 
 		PostgisConcaveHullBuilder hullBuilder = new PostgisConcaveHullBuilder(dataSource);
 		Polygon hull = hullBuilder.buildHull(isochrone);

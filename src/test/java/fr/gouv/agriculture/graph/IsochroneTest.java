@@ -12,6 +12,7 @@ import org.junit.Test;
 import fr.gouv.agriculture.geojson.Feature;
 import fr.gouv.agriculture.geojson.FeatureCollection;
 import fr.gouv.agriculture.geojson.Polygon;
+import fr.gouv.agriculture.graph.utils.NodeUtils;
 
 public class IsochroneTest extends AbstractGraphTest {
 
@@ -22,7 +23,9 @@ public class IsochroneTest extends AbstractGraphTest {
 		Node source =getNode(0L);
 		double distance = 300.0;
 		
-		List<Node> isochrone = Isochrone.isochrone(graph, source, distance);
+		Isochrone processor =
+				new Isochrone(new PriorityQueueDijkstraIterator.Factory());
+		List<Node> isochrone = processor.isochrone(graph, source, distance);
 		
 		assertTrue("Isochrone has not null length", isochrone.size() > 0);
 		
@@ -44,12 +47,14 @@ public class IsochroneTest extends AbstractGraphTest {
 		double distance = 30000.0; // 30 km
 		
 		long start = System.currentTimeMillis();
-		List<Node> isochrone = Isochrone.isochrone(graph, source, distance);
+		Isochrone processor =
+				new Isochrone(new PriorityQueueDijkstraIterator.Factory());
+		List<Node> isochrone = processor.isochrone(graph, source, distance);
 		assertTrue("Isochrone has not null length", isochrone.size() > 0);
 		assertEquals(isochrone.get(0), isochrone.get(isochrone.size() - 1));
 		long duration = System.currentTimeMillis() - start;
 		
-		Polygon geometry = Isochrone.asPolygon(isochrone);
+		Polygon geometry = NodeUtils.asPolygon(isochrone);
 		Feature<Polygon> feature = new Feature<Polygon>();
 		feature.geometry = geometry;
 		feature.properties.put("source", source.id);
@@ -71,7 +76,9 @@ public class IsochroneTest extends AbstractGraphTest {
 		double[] distances = { 10000.0, 20000.0, 30000.0 };
 		
 		long start = System.currentTimeMillis();
-		List<List<Node>> isochrones = Isochrone.isochrones(graph, source, distances);
+		Isochrone processor =
+				new Isochrone(new PriorityQueueDijkstraIterator.Factory());
+		List<List<Node>> isochrones = processor.isochrones(graph, source, distances);
 		long duration = System.currentTimeMillis() - start;
 		
 		FeatureCollection<Polygon> collection = new FeatureCollection<Polygon>();
@@ -84,7 +91,7 @@ public class IsochroneTest extends AbstractGraphTest {
 			assertEquals(isochrone.get(0), isochrone.get(isochrone.size() - 1));
 			System.out.println("Isochrone (d=" + distance + ") nodes : " + isochrone.size());
 			
-			Polygon geometry = Isochrone.asPolygon(isochrone);
+			Polygon geometry = NodeUtils.asPolygon(isochrone);
 			Feature<Polygon> feature = new Feature<Polygon>();
 			feature.geometry = geometry;
 			feature.properties.put("source", source.id);

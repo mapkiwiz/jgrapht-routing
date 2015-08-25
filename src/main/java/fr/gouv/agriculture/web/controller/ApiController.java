@@ -29,6 +29,7 @@ import fr.gouv.agriculture.geojson.Feature;
 import fr.gouv.agriculture.geojson.LineString;
 import fr.gouv.agriculture.geojson.Point;
 import fr.gouv.agriculture.geojson.Polygon;
+import fr.gouv.agriculture.graph.DijsktraIteratorFactory;
 import fr.gouv.agriculture.graph.Isochrone;
 import fr.gouv.agriculture.graph.Node;
 import fr.gouv.agriculture.graph.Path;
@@ -51,6 +52,9 @@ public class ApiController implements DisposableBean {
 	public double isochroneMinDistance = 10000.0; // 10 km
 	public double isochroneMaxDistance = 60000.0; // 60 km
 	public double searchDistance = 0.05;
+	
+	@Autowired
+	private DijsktraIteratorFactory iteratorFactory;
 	
 	@Autowired
 	private Graph<Node, DefaultWeightedEdge> graph;
@@ -104,7 +108,8 @@ final long startTime = System.currentTimeMillis();
 		statsDClient.recordExecutionTimeToNow("routing.locate.execution", startTime);
 		
 		long spStartTime = System.currentTimeMillis();
-		Path<Node> path = ShortestPath.shortestPath(graph, sourceNode, targetNode);
+		ShortestPath shortestPath = new ShortestPath(this.iteratorFactory);
+		Path<Node> path = shortestPath.shortestPath(graph, sourceNode, targetNode);
 		statsDClient.recordExecutionTimeToNow("routing.route.execution.shortest_path", spStartTime);
 		
 		double distance = 0.0;
@@ -166,7 +171,8 @@ final long startTime = System.currentTimeMillis();
 							LOGGER.debug("[ROUTE] Entering thread pool");
 						}
 						
-						Path<Node> path = ShortestPath.shortestPath(graph, sourceNode, targetNode);
+						ShortestPath shortestPath = new ShortestPath(iteratorFactory);
+						Path<Node> path = shortestPath.shortestPath(graph, sourceNode, targetNode);
 					
 						if (LOGGER.isDebugEnabled()) {
 							long duration = System.currentTimeMillis() - startTime;
@@ -237,7 +243,8 @@ final long startTime = System.currentTimeMillis();
 			throw new NearestNodeNotFound("No node near point (" + lon + "," + lat + ")");
 		}
 		
-		List<Node> nodes = Isochrone.isochroneRaw(graph, node, distance);
+		Isochrone processor = new Isochrone(this.iteratorFactory);
+		List<Node> nodes = processor.isochroneRaw(graph, node, distance);
 		ConcaveHullBuilder builder = new ConcaveHullBuilder();
 		Polygon polygon = builder.buildHull(nodes);
 		

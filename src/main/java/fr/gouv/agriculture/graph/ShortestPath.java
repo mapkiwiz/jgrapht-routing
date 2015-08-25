@@ -9,11 +9,16 @@ import java.util.Set;
 import org.jgrapht.Graph;
 
 public class ShortestPath {
+	
+	private final DijsktraIteratorFactory iteratorFactory;
+	
+	public ShortestPath(DijsktraIteratorFactory factory) {
+		this.iteratorFactory = factory;
+	}
 
-	public static <V,E> double shortestPathLength(Graph<V, E> graph, V source, V target) {
+	public <V,E> double shortestPathLength(Graph<V, E> graph, V source, V target) {
 
-		PQClosestFirstIterator<V, E> iterator =
-				new PQClosestFirstIterator<V, E>(graph, source);
+		DijkstraIterator<V> iterator = this.iteratorFactory.create(graph, source);
 
 		while (iterator.hasNext()) {
 			V next = iterator.next();
@@ -26,12 +31,12 @@ public class ShortestPath {
 
 	}
 
-	public static <V,E> Path<V> shortestPath(Graph<V,E> graph, V source, V target) {
+	public <V,E> Path<V> shortestPath(Graph<V,E> graph, V source, V target) {
 
-		PQClosestFirstIterator<V, E> forwardIterator =
-				new PQClosestFirstIterator<V, E>(graph, source);
-		PQClosestFirstIterator<V, E> reverseIterator =
-				new PQClosestFirstIterator<V, E>(graph, target);
+		DijkstraIterator<V> forwardIterator =
+				this.iteratorFactory.create(graph, source);
+		DijkstraIterator<V> reverseIterator =
+				this.iteratorFactory.create(graph, target);
 
 		Set<V> forwardSet = new HashSet<V>();
 		Set<V> reverseSet = new HashSet<V>();
@@ -62,10 +67,10 @@ public class ShortestPath {
 
 		if (middlePoint != null) {
 
-			Path<V> path = getShortestPath(graph, forwardIterator, source, middlePoint);
+			Path<V> path = forwardIterator.getPath(middlePoint);
 			path.elements.remove(0);
 			Collections.reverse(path.elements);
-			Path<V> reversePath = getShortestPath(graph, reverseIterator, target, middlePoint);
+			Path<V> reversePath = reverseIterator.getPath(middlePoint);
 			path.elements.addAll(reversePath.elements);
 
 			return path;
@@ -78,27 +83,12 @@ public class ShortestPath {
 
 	}
 
-	private static <V,E> Path<V> getShortestPath(Graph<V,E> graph, PQClosestFirstIterator<V, E> iterator, V source, V target) {
+	public <V,E> double bidirectionalShortestPathLength(Graph<V, E> graph, V source, V target) {
 
-		Path<V> path = new Path<V>();
-
-		PathElement<V> pathElement = new PathElement<V>(target, 0.0, 0.0);
-		
-		while (pathElement.node != null) {
-			path.elements.add(pathElement);
-			pathElement = iterator.getPathElement(pathElement.node);
-		}
-
-		return path;
-
-	}
-
-	public static <V,E> double bidirectionalShortestPathLength(Graph<V, E> graph, V source, V target) {
-
-		PQClosestFirstIterator<V, E> forwardIterator =
-				new PQClosestFirstIterator<V, E>(graph, source);
-		PQClosestFirstIterator<V, E> reverseIterator =
-				new PQClosestFirstIterator<V, E>(graph, target);
+		DijkstraIterator<V> forwardIterator =
+				this.iteratorFactory.create(graph, source);
+		DijkstraIterator<V> reverseIterator =
+				this.iteratorFactory.create(graph, target);
 
 		Set<V> forwardSet = new HashSet<V>();
 		Set<V> reverseSet = new HashSet<V>();
@@ -134,36 +124,10 @@ public class ShortestPath {
 		}
 	}
 
-	public static <V,E> List<V> getAdjacentNodes(Graph<V, E> graph, V node) {
+	public <V, E> List<V> searchByDistance(Graph<V, E> graph, V source, double distance) {
 
-		List<V> nodes = new ArrayList<V>();
-		for (E edge : graph.edgesOf(node)) {
-			V other = getOtherNodeOfEdge(graph, edge, node);
-			nodes.add(other);
-		}
-
-		return nodes;
-
-	}
-
-	public static <V,E> V getOtherNodeOfEdge(Graph<V,E> graph, E edge, V node) {
-
-		V source = graph.getEdgeSource(edge);
-		V target = graph.getEdgeTarget(edge);
-
-		if (source.equals(node)) {
-			return target;
-		} else {
-			assert(target.equals(node));
-			return source;
-		}
-
-	}
-
-	public static <V, E> List<V> searchByDistance(Graph<V, E> graph, V source, double distance) {
-
-		PQClosestFirstIterator<V, E> iterator =
-				new PQClosestFirstIterator<V, E>(graph, source);
+		DijkstraIterator<V> iterator =
+				this.iteratorFactory.create(graph, source);
 		List<V> results = new ArrayList<V>();
 
 		while (iterator.hasNext()) {

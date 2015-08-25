@@ -22,7 +22,9 @@ public class ShortestPathTest extends AbstractGraphTest {
 		Node source = getNode(SMALL_GRAPH_ORIGIN_NODE_ID);
 		Node target = getNode(SMALL_GRAPH_TOPRIGHT_NODE_ID);
 		
-		double distance = ShortestPath.shortestPathLength(graph, source, target);
+		ShortestPath shortestPath = new ShortestPath(
+				new PriorityQueueDijkstraIterator.Factory());
+		double distance = shortestPath.shortestPathLength(graph, source, target);
 		assertTrue("Path has not of null length", distance > 0);
 		
 		assertTrue("Distance 0->899 is 709.0 u.", distance == 709.0);
@@ -36,7 +38,9 @@ public class ShortestPathTest extends AbstractGraphTest {
 		Node source = getNode(SMALL_GRAPH_ORIGIN_NODE_ID);
 		Node target = getNode(SMALL_GRAPH_TOPRIGHT_NODE_ID);
 		
-		double distance = ShortestPath.bidirectionalShortestPathLength(graph, source, target);
+		ShortestPath shortestPath = new ShortestPath(
+				new PriorityQueueDijkstraIterator.Factory());
+		double distance = shortestPath.bidirectionalShortestPathLength(graph, source, target);
 		System.out.println(distance);
 		
 		assertTrue("Path has not of null length", distance > 0);
@@ -53,7 +57,9 @@ public class ShortestPathTest extends AbstractGraphTest {
 		Node target = getNode(VALENCE_NODE_ID);
 		
 		long start = System.currentTimeMillis();
-		double distance = ShortestPath.shortestPathLength(graph, source, target);
+		ShortestPath shortestPath = new ShortestPath(
+				new PriorityQueueDijkstraIterator.Factory());
+		double distance = shortestPath.shortestPathLength(graph, source, target);
 		long duration = System.currentTimeMillis() - start;
 		
 		System.out.println("Distance : " + distance);
@@ -71,7 +77,9 @@ public class ShortestPathTest extends AbstractGraphTest {
 		Node target = getNode(VALENCE_NODE_ID);
 		
 		long start = System.currentTimeMillis();
-		double distance = ShortestPath.bidirectionalShortestPathLength(graph, source, target);
+		ShortestPath shortestPath = new ShortestPath(
+				new PriorityQueueDijkstraIterator.Factory());
+		double distance = shortestPath.bidirectionalShortestPathLength(graph, source, target);
 		long duration = System.currentTimeMillis() - start;
 		
 		System.out.println("Distance : " + distance);
@@ -89,7 +97,9 @@ public class ShortestPathTest extends AbstractGraphTest {
 		Node target = getNode(VALENCE_NODE_ID);
 		
 		long start = System.currentTimeMillis();
-		Path<Node> path = ShortestPath.shortestPath(graph, source, target);
+		ShortestPath shortestPath = new ShortestPath(
+				new PriorityQueueDijkstraIterator.Factory());
+		Path<Node> path = shortestPath.shortestPath(graph, source, target);
 		long duration = System.currentTimeMillis() - start;
 		
 		System.out.println("Duration : " + (duration / 1000.0));

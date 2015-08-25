@@ -5,33 +5,39 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jgrapht.Graph;
-import org.jgrapht.traverse.ClosestFirstIterator;
 
-import fr.gouv.agriculture.geojson.Polygon;
 import fr.gouv.agriculture.hull.ConvexHullBuilder;
 
 public class Isochrone {
 	
-	public static <E> List<Node> isochrone(Graph<Node, E> graph, Node source, double distance) {
+	private final DijsktraIteratorFactory iteratorFactory;
+	private final ShortestPath shortestPath;
+	
+	public Isochrone(DijsktraIteratorFactory factory) {
+		this.iteratorFactory = factory;
+		this.shortestPath = new ShortestPath(factory);
+	}
+	
+	public <E> List<Node> isochrone(Graph<Node, E> graph, Node source, double distance) {
 		
 		assert(distance > 0);
 		
-		List<Node> nodes = ShortestPath.searchByDistance(graph, source, distance);
+		List<Node> nodes = shortestPath.searchByDistance(graph, source, distance);
 		List<Node> convexHull = ConvexHullBuilder.convexHull(nodes);
 		return convexHull;
 		
 	}
 	
-	public static <E> List<Node> isochroneRaw(Graph<Node, E> graph, Node source, double distance) {
+	public <E> List<Node> isochroneRaw(Graph<Node, E> graph, Node source, double distance) {
 		
 		assert(distance > 0);
 		
-		List<Node> nodes = ShortestPath.searchByDistance(graph, source, distance);
+		List<Node> nodes = shortestPath.searchByDistance(graph, source, distance);
 		return nodes;
 		
 	}
 	
-	public static <E> List<List<Node>> isochrones(Graph<Node, E> graph, Node source, double... distances) {
+	public <E> List<List<Node>> isochrones(Graph<Node, E> graph, Node source, double... distances) {
 		
 		for (double distance : distances) {
 			assert(distance > 0);
@@ -39,8 +45,8 @@ public class Isochrone {
 		
 		Arrays.sort(distances);
 		
-		ClosestFirstIterator<Node, E> iterator =
-				new ClosestFirstIterator<Node, E>(graph, source);
+		DijkstraIterator<Node> iterator =
+				this.iteratorFactory.create(graph, source);
 		
 		List<List<Node>> isochrones = new ArrayList<List<Node>>();
 		Node currentNode = null;
@@ -72,20 +78,6 @@ public class Isochrone {
 		}
 		
 		return isochrones;
-		
-	}
-	
-	public static Polygon asPolygon(List<Node> isochrone) {
-		
-		Polygon geometry = new Polygon();
-		List<List<List<Double>>> coordinates = new ArrayList<List<List<Double>>>();
-		List<List<Double>> exteriorRing = new ArrayList<List<Double>>();
-		for (Node n : isochrone) {
-			exteriorRing.add(n.asCoordinatePair());
-		}
-		coordinates.add(exteriorRing);
-		geometry.coordinates = coordinates;
-		return geometry;
 		
 	}
 
