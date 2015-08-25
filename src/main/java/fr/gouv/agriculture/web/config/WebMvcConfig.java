@@ -6,11 +6,13 @@
 package fr.gouv.agriculture.web.config;
 
 import java.util.Arrays;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.concurrent.ThreadPoolExecutorFactoryBean;
 import org.springframework.web.accept.ContentNegotiationManagerFactoryBean;
 import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
@@ -21,7 +23,11 @@ import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
+import com.timgroup.statsd.NonBlockingStatsDClient;
+import com.timgroup.statsd.StatsDClient;
+
 import fr.gouv.agriculture.web.controller.ApiController;
+import fr.gouv.agriculture.web.controller.filter.RequestTimerFilter;
 
 /**
  *
@@ -29,6 +35,16 @@ import fr.gouv.agriculture.web.controller.ApiController;
 @Configuration
 @EnableWebMvc
 public class WebMvcConfig extends WebMvcConfigurerAdapter {
+	
+	@Bean
+	public StatsDClient statsdClient() {
+		return new NonBlockingStatsDClient("routing", "localhost", 8125);
+	}
+	
+	@Bean
+	public RequestTimerFilter timerFilter() {
+		return new RequestTimerFilter();
+	}
 
 	@Bean
 	public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
@@ -55,8 +71,16 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
 	}
 	
 	@Bean
-	public ApiController apiController() {
-		return new ApiController();
+	public ThreadPoolExecutorFactoryBean threadPoolExecutorFactoryBean() {
+		ThreadPoolExecutorFactoryBean bean = new ThreadPoolExecutorFactoryBean();
+		bean.setThreadGroupName("routing");
+		return bean;
+	}
+	
+	@Bean
+	public ApiController apiController(ThreadPoolExecutor executor) {
+		ApiController controller = new ApiController(executor);
+		return controller;
 	}
 	
 //	@Bean

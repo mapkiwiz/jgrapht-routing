@@ -2,19 +2,28 @@ package fr.gouv.agriculture.web.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.timgroup.statsd.StatsDClient;
 
 import fr.gouv.agriculture.geojson.Feature;
 import fr.gouv.agriculture.geojson.LineString;
@@ -28,8 +37,14 @@ import fr.gouv.agriculture.graph.ShortestPath;
 import fr.gouv.agriculture.hull.ConcaveHullBuilder;
 import fr.gouv.agriculture.locator.NodeLocator;
 
+
 @RestController
-public class ApiController {
+@RequestMapping("/api/v1")
+@CrossOrigin(
+		methods={ RequestMethod.OPTIONS, RequestMethod.GET, RequestMethod.POST },
+		allowCredentials="false",
+		origins={ "*" })
+public class ApiController implements DisposableBean {
 	
 	private final static Logger LOGGER = LoggerFactory.getLogger(ApiController.class);
 	
@@ -43,12 +58,23 @@ public class ApiController {
 	@Autowired
 	private NodeLocator nodeLocator;
 	
-	@RequestMapping("/api/v1/info")
+	@Autowired
+	private StatsDClient statsDClient;
+	
+	private final ThreadPoolExecutor executor;
+	
+	public ApiController(ThreadPoolExecutor executor) {
+		executor.setCorePoolSize(4);
+		executor.setMaximumPoolSize(4);
+		this.executor = executor;
+	}
+	
+	@RequestMapping("/info")
 	public AppInfo getAppInfo() {
 		return new AppInfo();
 	}
 	
-	@RequestMapping("/api/v1/locate")
+	@RequestMapping("/locate")
 	public Feature<Point> locate(@RequestParam("lon") double lon, @RequestParam("lat") double lat) throws NearestNodeNotFound {
 		
 		Node node = nodeLocator.locate(lon, lat, searchDistance);
@@ -67,13 +93,19 @@ public class ApiController {
 		
 	}
 	
-	@RequestMapping("/api/v1/distance")
+	@RequestMapping("/distance")
 	public DistanceInfo distance(@RequestParam("source") List<Double> source, @RequestParam("target") List<Double> target) throws NotFoundException, InvalidRequestException {
 				
-		Node sourceNode = getNodeFromLocParameter(source);
-		Node targetNode = getNodeFromLocParameter(target);
+final long startTime = System.currentTimeMillis();
 		
+		final Node sourceNode = getNodeFromLocParameter(source);
+		final Node targetNode = getNodeFromLocParameter(target);
+		
+		statsDClient.recordExecutionTimeToNow("routing.locate.execution", startTime);
+		
+		long spStartTime = System.currentTimeMillis();
 		Path<Node> path = ShortestPath.shortestPath(graph, sourceNode, targetNode);
+		statsDClient.recordExecutionTimeToNow("routing.route.execution.shortest_path", spStartTime);
 		
 		double distance = 0.0;
 		double time = 0.0;
@@ -88,6 +120,9 @@ public class ApiController {
 		info.time = time;
 		info.source = asPoint(sourceNode);
 		info.target = asPoint(targetNode);
+		
+		statsDClient.recordExecutionTimeToNow("routing.route.execution.request.total", startTime);
+		statsDClient.increment("routing.route.request.count");
 		
 		return info;
 		
@@ -112,13 +147,57 @@ public class ApiController {
 		
 	}
 	
-	@RequestMapping("/api/v1/route")
+	@RequestMapping("/route")
 	public Feature<LineString> route(@RequestParam("source") List<Double> source, @RequestParam("target") List<Double> target) throws NotFoundException, InvalidRequestException {
 		
-		Node sourceNode = getNodeFromLocParameter(source);
-		Node targetNode = getNodeFromLocParameter(target);
+		final long startTime = System.currentTimeMillis();
 		
-		Path<Node> path = ShortestPath.shortestPath(graph, sourceNode, targetNode);
+		final Node sourceNode = getNodeFromLocParameter(source);
+		final Node targetNode = getNodeFromLocParameter(target);
+		
+		statsDClient.recordExecutionTimeToNow("routing.locate.execution", startTime);
+		
+		Future<Path<Node>> promise = this.executor.submit(
+				new Callable<Path<Node>>() {
+
+					public Path<Node> call() throws Exception {
+		
+						if (LOGGER.isDebugEnabled()) {
+							LOGGER.debug("[ROUTE] Entering thread pool");
+						}
+						
+						Path<Node> path = ShortestPath.shortestPath(graph, sourceNode, targetNode);
+					
+						if (LOGGER.isDebugEnabled()) {
+							long duration = System.currentTimeMillis() - startTime;
+							LOGGER.debug("[ROUTE] Exiting thread pool, execution time {} ms.", duration);
+						}
+						
+						return path;
+						
+					}
+		
+		});
+		
+		Path<Node> path;
+		long spStartTime = System.currentTimeMillis();
+		
+		try {
+			path = promise.get();
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		} catch (ExecutionException e) {
+			if (e.getCause() instanceof NotFoundException) {
+				throw (NotFoundException) e.getCause();
+			}
+			throw new RuntimeException(e);
+		}
+		
+		statsDClient.recordExecutionTimeToNow("routing.route.execution.shortest_path", spStartTime);
+		
+		if (path.elements.isEmpty()) {
+			throw new NoPathBetweenPoints(sourceNode, targetNode);
+		}
 		
 		List<List<Double>> coordinates = new ArrayList<List<Double>>();
 		double distance = 0.0;
@@ -139,11 +218,13 @@ public class ApiController {
 		feature.properties.put("distance", distance);
 		feature.properties.put("time", time);
 		
+		statsDClient.recordExecutionTimeToNow("routing.route.execution.request.total", startTime);
+		statsDClient.increment("routing.route.request.count");
 		return feature;
 		
 	}
 	
-	@RequestMapping("/api/v1/isochrone")
+	@RequestMapping("/isochrone")
 	public Polygon isochrone(@RequestParam(value="lon") double lon, @RequestParam("lat") double lat, @RequestParam(value="distance") double distance) throws NotFoundException, InvalidRequestException {
 		
 		if (distance < isochroneMinDistance || distance > isochroneMaxDistance) {
@@ -168,6 +249,8 @@ public class ApiController {
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public ExceptionReport reportNotFound(NotFoundException ex) {
 		
+		LOGGER.info("404 - ", ex.getMessage());
+		
 		ExceptionReport report = new ExceptionReport();
 		report.error = ex.getClass().getSimpleName();
 		report.message = ex.getMessage();
@@ -178,6 +261,8 @@ public class ApiController {
 	@ExceptionHandler({ InvalidRequestException.class, MissingServletRequestParameterException.class })
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ExceptionReport reportInvalidRequest(Exception ex) {
+		
+		LOGGER.info("400 - {}", ex.getMessage());
 		
 		ExceptionReport report = new ExceptionReport();
 		report.error = ex.getClass().getSimpleName();
@@ -257,6 +342,26 @@ public class ApiController {
 			super(message);
 		}
 		
+	}
+	
+	public static class NoPathBetweenPoints extends NotFoundException {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 5860120457753330436L;
+
+		public NoPathBetweenPoints(Node source, Node target) {
+			super("No path found between points (" + source.lon
+					+ "," + source.lat
+					+ ") and (" + target.lon
+					+ "," + target.lat + ")");
+		}
+		
+	}
+
+	public void destroy() throws Exception {
+		this.executor.shutdownNow();
 	}
 
 }

@@ -7,13 +7,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.jgrapht.Graph;
+import org.jgrapht.traverse.ClosestFirstIterator;
 
-public class ShortestPath {
+public class FibonacciShortestPath {
 
 	public static <V,E> double shortestPathLength(Graph<V, E> graph, V source, V target) {
 
-		PQClosestFirstIterator<V, E> iterator =
-				new PQClosestFirstIterator<V, E>(graph, source);
+		ClosestFirstIterator<V, E> iterator =
+				new ClosestFirstIterator<V, E>(graph, source);
 
 		while (iterator.hasNext()) {
 			V next = iterator.next();
@@ -28,10 +29,10 @@ public class ShortestPath {
 
 	public static <V,E> Path<V> shortestPath(Graph<V,E> graph, V source, V target) {
 
-		PQClosestFirstIterator<V, E> forwardIterator =
-				new PQClosestFirstIterator<V, E>(graph, source);
-		PQClosestFirstIterator<V, E> reverseIterator =
-				new PQClosestFirstIterator<V, E>(graph, target);
+		ClosestFirstIterator<V, E> forwardIterator =
+				new ClosestFirstIterator<V, E>(graph, source);
+		ClosestFirstIterator<V, E> reverseIterator =
+				new ClosestFirstIterator<V, E>(graph, target);
 
 		Set<V> forwardSet = new HashSet<V>();
 		Set<V> reverseSet = new HashSet<V>();
@@ -78,15 +79,19 @@ public class ShortestPath {
 
 	}
 
-	private static <V,E> Path<V> getShortestPath(Graph<V,E> graph, PQClosestFirstIterator<V, E> iterator, V source, V target) {
+	private static <V,E> Path<V> getShortestPath(Graph<V,E> graph, ClosestFirstIterator<V, E> iterator, V source, V target) {
 
 		Path<V> path = new Path<V>();
 
-		PathElement<V> pathElement = new PathElement<V>(target, 0.0, 0.0);
-		
-		while (pathElement.node != null) {
-			path.elements.add(pathElement);
-			pathElement = iterator.getPathElement(pathElement.node);
+		V currentNode = target;
+		path.elements.add(new PathElement<V>(currentNode, 0.0, 0.0));
+
+		while (!currentNode.equals(source)) {
+			E edge = iterator.getSpanningTreeEdge(currentNode);
+			double weight = graph.getEdgeWeight(edge);
+			double distance = weight;
+			currentNode = getOtherNodeOfEdge(graph, edge, currentNode);
+			path.elements.add(new PathElement<V>(currentNode, distance, weight));
 		}
 
 		return path;
@@ -95,10 +100,10 @@ public class ShortestPath {
 
 	public static <V,E> double bidirectionalShortestPathLength(Graph<V, E> graph, V source, V target) {
 
-		PQClosestFirstIterator<V, E> forwardIterator =
-				new PQClosestFirstIterator<V, E>(graph, source);
-		PQClosestFirstIterator<V, E> reverseIterator =
-				new PQClosestFirstIterator<V, E>(graph, target);
+		ClosestFirstIterator<V, E> forwardIterator =
+				new ClosestFirstIterator<V, E>(graph, source);
+		ClosestFirstIterator<V, E> reverseIterator =
+				new ClosestFirstIterator<V, E>(graph, target);
 
 		Set<V> forwardSet = new HashSet<V>();
 		Set<V> reverseSet = new HashSet<V>();
@@ -162,8 +167,8 @@ public class ShortestPath {
 
 	public static <V, E> List<V> searchByDistance(Graph<V, E> graph, V source, double distance) {
 
-		PQClosestFirstIterator<V, E> iterator =
-				new PQClosestFirstIterator<V, E>(graph, source);
+		ClosestFirstIterator<V, E> iterator =
+				new ClosestFirstIterator<V, E>(graph, source);
 		List<V> results = new ArrayList<V>();
 
 		while (iterator.hasNext()) {
