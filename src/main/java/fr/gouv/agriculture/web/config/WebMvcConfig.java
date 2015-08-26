@@ -27,7 +27,7 @@ import com.timgroup.statsd.NonBlockingStatsDClient;
 import com.timgroup.statsd.StatsDClient;
 
 import fr.gouv.agriculture.web.controller.ApiController;
-import fr.gouv.agriculture.web.controller.filter.RequestTimerFilter;
+import fr.gouv.agriculture.web.filter.RequestTimerFilter;
 
 /**
  *
@@ -79,6 +79,8 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
 	
 	@Bean
 	public ApiController apiController(ThreadPoolExecutor executor) {
+		executor.setCorePoolSize(4);
+		executor.setMaximumPoolSize(4);
 		ApiController controller = new ApiController(executor);
 		return controller;
 	}

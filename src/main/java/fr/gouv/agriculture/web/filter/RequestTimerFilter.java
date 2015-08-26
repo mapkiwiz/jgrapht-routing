@@ -1,4 +1,4 @@
-package fr.gouv.agriculture.web.controller.filter;
+package fr.gouv.agriculture.web.filter;
 
 import java.io.IOException;
 
@@ -30,7 +30,7 @@ public class RequestTimerFilter extends OncePerRequestFilter {
 		filterChain.doFilter(request, response);
 		long duration = System.currentTimeMillis() - start;
 		
-		String method = request.getRequestURI();
+		String method = request.getRequestURI().replaceFirst("/", "").replace("/", ".");
 		LOGGER.info("{}, {} ms.", method, duration);
 		statsdClient.incrementCounter(method);
 		statsdClient.recordExecutionTime(method, duration);
