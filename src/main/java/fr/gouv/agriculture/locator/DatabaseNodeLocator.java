@@ -8,7 +8,7 @@ import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
-import fr.gouv.agriculture.graph.Node;
+import fr.gouv.agriculture.geo.Node;
 
 public class DatabaseNodeLocator implements NodeLocator {
 	

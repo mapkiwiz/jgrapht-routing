@@ -6,6 +6,8 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.junit.Test;
 
+import fr.gouv.agriculture.geo.Node;
+import fr.gouv.agriculture.graph.loader.JdbcEdgeListGraphLoader;
 import fr.gouv.agriculture.test.AbstractHsqlDbTest;
 
 public class JdbcEdgeListGraphLoaderTest extends AbstractHsqlDbTest {

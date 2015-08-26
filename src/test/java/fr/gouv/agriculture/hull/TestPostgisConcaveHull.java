@@ -12,10 +12,11 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import fr.gouv.agriculture.geo.Node;
+import fr.gouv.agriculture.geo.algorithm.PostgisConcaveHullBuilder;
 import fr.gouv.agriculture.geojson.Polygon;
 import fr.gouv.agriculture.graph.AbstractGraphTest;
 import fr.gouv.agriculture.graph.Isochrone;
-import fr.gouv.agriculture.graph.Node;
 import fr.gouv.agriculture.graph.PriorityQueueDijkstraIterator;
 import fr.gouv.agriculture.test.DatabaseTestHelper;
 import fr.gouv.agriculture.test.PostgisTest;
@@ -34,7 +35,7 @@ public class TestPostgisConcaveHull extends AbstractGraphTest {
 		double distance = 50000.0;
 		Isochrone processor =
 				new Isochrone(new PriorityQueueDijkstraIterator.Factory());
-		List<Node> isochrone = processor.isochroneRaw(graph, source, distance);
+		List<Node> isochrone = processor.isochrone(graph, source, distance);
 
 		PostgisConcaveHullBuilder hullBuilder = new PostgisConcaveHullBuilder(dataSource);
 		Polygon hull = hullBuilder.buildHull(isochrone);

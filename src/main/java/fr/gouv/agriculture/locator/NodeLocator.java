@@ -1,6 +1,6 @@
 package fr.gouv.agriculture.locator;
 
-import fr.gouv.agriculture.graph.Node;
+import fr.gouv.agriculture.geo.Node;
 
 public interface NodeLocator {
 	

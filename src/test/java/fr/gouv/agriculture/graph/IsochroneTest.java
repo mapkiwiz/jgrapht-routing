@@ -9,10 +9,12 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.junit.Test;
 
+import fr.gouv.agriculture.geo.Node;
+import fr.gouv.agriculture.geo.NodeUtils;
+import fr.gouv.agriculture.geo.algorithm.ConvexHullBuilder;
 import fr.gouv.agriculture.geojson.Feature;
 import fr.gouv.agriculture.geojson.FeatureCollection;
 import fr.gouv.agriculture.geojson.Polygon;
-import fr.gouv.agriculture.graph.utils.NodeUtils;
 
 public class IsochroneTest extends AbstractGraphTest {
 
@@ -50,11 +52,12 @@ public class IsochroneTest extends AbstractGraphTest {
 		Isochrone processor =
 				new Isochrone(new PriorityQueueDijkstraIterator.Factory());
 		List<Node> isochrone = processor.isochrone(graph, source, distance);
-		assertTrue("Isochrone has not null length", isochrone.size() > 0);
-		assertEquals(isochrone.get(0), isochrone.get(isochrone.size() - 1));
+		List<Node> hull = ConvexHullBuilder.convexHull(isochrone);
+		assertTrue("Isochrone has not null length", hull.size() > 0);
+		assertEquals(hull.get(0), hull.get(hull.size() - 1));
 		long duration = System.currentTimeMillis() - start;
 		
-		Polygon geometry = NodeUtils.asPolygon(isochrone);
+		Polygon geometry = NodeUtils.asPolygon(hull);
 		Feature<Polygon> feature = new Feature<Polygon>();
 		feature.geometry = geometry;
 		feature.properties.put("source", source.id);
@@ -87,11 +90,12 @@ public class IsochroneTest extends AbstractGraphTest {
 		for (List<Node> isochrone : isochrones) {
 		
 			double distance = distances[k++];
-			assertTrue("Isochrone has not null length", isochrone.size() > 0);
-			assertEquals(isochrone.get(0), isochrone.get(isochrone.size() - 1));
+			List<Node> hull = ConvexHullBuilder.convexHull(isochrone);
+			assertTrue("Isochrone has not null length", hull.size() > 0);
+			assertEquals(hull.get(0), hull.get(hull.size() - 1));
 			System.out.println("Isochrone (d=" + distance + ") nodes : " + isochrone.size());
 			
-			Polygon geometry = NodeUtils.asPolygon(isochrone);
+			Polygon geometry = NodeUtils.asPolygon(hull);
 			Feature<Polygon> feature = new Feature<Polygon>();
 			feature.geometry = geometry;
 			feature.properties.put("source", source.id);

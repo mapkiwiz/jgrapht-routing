@@ -1,4 +1,4 @@
-package fr.gouv.agriculture.graph;
+package fr.gouv.agriculture.graph.loader;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -8,6 +8,8 @@ import java.util.Map;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
+
+import fr.gouv.agriculture.geo.Node;
 
 public abstract class AbstractEdgeListGraphLoader {
 	
@@ -22,6 +24,8 @@ public abstract class AbstractEdgeListGraphLoader {
 		Object data;
 		
 	}
+	
+	public abstract Map<Long, Node> getNodeMap();
 	
 	public abstract Iterator<Node> getNodeIterator() throws IOException;
 	

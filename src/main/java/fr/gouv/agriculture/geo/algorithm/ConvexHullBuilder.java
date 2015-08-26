@@ -1,13 +1,13 @@
-package fr.gouv.agriculture.hull;
+package fr.gouv.agriculture.geo.algorithm;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
+import fr.gouv.agriculture.geo.LexicographicNodeComparator;
+import fr.gouv.agriculture.geo.Node;
+import fr.gouv.agriculture.geo.NodeUtils;
 import fr.gouv.agriculture.geojson.Polygon;
-import fr.gouv.agriculture.graph.Node;
-import fr.gouv.agriculture.graph.utils.NodeUtils;
 
 public class ConvexHullBuilder implements HullBuilder {
 	
@@ -19,7 +19,7 @@ public class ConvexHullBuilder implements HullBuilder {
 			return new ArrayList<Node>(nodes);
 		}
 		
-		Collections.sort(nodes, new ConvexHullBuilder.NodeComparator());
+		Collections.sort(nodes, new LexicographicNodeComparator());
 		Node[] hull = new Node[2 * nodes.size()];
 		
 		// lower hull
@@ -56,36 +56,8 @@ public class ConvexHullBuilder implements HullBuilder {
 		
 	}
 	
-	protected static double cross(Node o, Node a, Node b) {
-		double ax = a.lon - o.lon;
-		double ay = a.lat - o.lat;
-		double bx = b.lon - o.lon;
-		double by = b.lat - o.lat;
-		return (ax * by - ay * bx);
-	}
-	
-	public static class NodeComparator implements Comparator<Node> {
-
-		public int compare(Node o1, Node o2) {
-			
-			if (o1.lon == o2.lon) {
-				if (o1.lat > o2.lat) {
-					return 1;
-				} else if (o1.lat == o2.lat) {
-					return 0;
-				} else {
-					return -1;
-				}
-			} else {
-				if (o1.lon > o2.lon) {
-					return 1;
-				} else {
-					return -1;
-				}
-			}
-			
-		}
-
+	private static double cross(Node o, Node a, Node b) {
+		return o.cross(a, b);
 	}
 
 	public Polygon buildHull(List<Node> nodes) {

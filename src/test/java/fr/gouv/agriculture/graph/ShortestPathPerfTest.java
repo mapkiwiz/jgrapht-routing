@@ -9,6 +9,7 @@ import org.jgrapht.graph.DefaultWeightedEdge;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import fr.gouv.agriculture.geo.Node;
 import fr.gouv.agriculture.test.PerformanceTest;
 
 @PerformanceTest

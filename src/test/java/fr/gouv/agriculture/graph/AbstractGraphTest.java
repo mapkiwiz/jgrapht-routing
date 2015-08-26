@@ -9,6 +9,9 @@ import java.util.Map;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
+import fr.gouv.agriculture.geo.Node;
+import fr.gouv.agriculture.graph.loader.CSVEdgeListGraphLoader;
+
 public abstract class AbstractGraphTest {
 	
 	public static final Long LYON_NODE_ID = 24951L;
@@ -30,7 +33,7 @@ public abstract class AbstractGraphTest {
 		
 		try {
 			graph = graphLoader.loadGraph();
-			nodeMap = graphLoader.nodeMap;
+			nodeMap = graphLoader.getNodeMap();
 		} catch (IOException e) {
 			fail(e.getMessage());
 			return null;
@@ -51,7 +54,7 @@ public abstract class AbstractGraphTest {
 		
 		try {
 			graph = graphLoader.loadGraph();
-			nodeMap = graphLoader.nodeMap;
+			nodeMap = graphLoader.getNodeMap();
 		} catch (IOException e) {
 			fail(e.getMessage());
 			return null;

@@ -9,8 +9,8 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.junit.Test;
 
+import fr.gouv.agriculture.geo.Node;
 import fr.gouv.agriculture.graph.AbstractGraphTest;
-import fr.gouv.agriculture.graph.Node;
 
 public class IndexNodeLocatorTest extends AbstractGraphTest {
 	

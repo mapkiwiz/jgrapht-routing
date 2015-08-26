@@ -12,10 +12,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
+import fr.gouv.agriculture.geo.Node;
 import fr.gouv.agriculture.graph.DijsktraIteratorFactory;
-import fr.gouv.agriculture.graph.JdbcEdgeListGraphLoader;
-import fr.gouv.agriculture.graph.Node;
 import fr.gouv.agriculture.graph.PriorityQueueDijkstraIterator;
+import fr.gouv.agriculture.graph.loader.JdbcEdgeListGraphLoader;
 import fr.gouv.agriculture.locator.IndexNodeLocator;
 import fr.gouv.agriculture.locator.NodeLocator;
 

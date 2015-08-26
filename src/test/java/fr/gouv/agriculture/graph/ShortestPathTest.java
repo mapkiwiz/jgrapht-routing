@@ -10,6 +10,7 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.junit.Test;
 
+import fr.gouv.agriculture.geo.Node;
 import fr.gouv.agriculture.geojson.Feature;
 import fr.gouv.agriculture.geojson.LineString;
 

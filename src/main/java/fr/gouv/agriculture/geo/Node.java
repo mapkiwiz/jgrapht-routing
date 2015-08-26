@@ -1,10 +1,10 @@
-package fr.gouv.agriculture.graph;
+package fr.gouv.agriculture.geo;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Node implements Serializable {
+public class Node implements Serializable, CrossProduct<Node> {
 	
 	/**
 	 * 
@@ -19,6 +19,14 @@ public class Node implements Serializable {
 		this.id = id;
 		this.lon = lon;
 		this.lat = lat;
+	}
+	
+	public double cross(Node a, Node b) {
+		double ax = a.lon - this.lon;
+		double ay = a.lat - this.lat;
+		double bx = b.lon - this.lon;
+		double by = b.lat - this.lat;
+		return (ax * by - ay * bx);
 	}
 	
 	@Override

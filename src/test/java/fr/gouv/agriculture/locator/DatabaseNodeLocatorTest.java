@@ -8,7 +8,7 @@ import javax.sql.DataSource;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import fr.gouv.agriculture.graph.Node;
+import fr.gouv.agriculture.geo.Node;
 import fr.gouv.agriculture.test.DatabaseTestHelper;
 import fr.gouv.agriculture.test.PostgisTest;
 

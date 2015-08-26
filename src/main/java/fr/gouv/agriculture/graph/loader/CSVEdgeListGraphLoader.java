@@ -1,4 +1,4 @@
-package fr.gouv.agriculture.graph;
+package fr.gouv.agriculture.graph.loader;
 
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -6,10 +6,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+
+import fr.gouv.agriculture.geo.Node;
 
 public class CSVEdgeListGraphLoader extends AbstractEdgeListGraphLoader {
 	
@@ -102,6 +105,11 @@ public class CSVEdgeListGraphLoader extends AbstractEdgeListGraphLoader {
 		
 		return data;
 		
+	}
+
+	@Override
+	public Map<Long, Node> getNodeMap() {
+		return nodeMap;
 	}
 
 }

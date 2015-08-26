@@ -21,17 +21,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.timgroup.statsd.StatsDClient;
 
+import fr.gouv.agriculture.geo.Node;
+import fr.gouv.agriculture.geo.algorithm.ConcaveHullBuilder;
 import fr.gouv.agriculture.geojson.Feature;
 import fr.gouv.agriculture.geojson.LineString;
 import fr.gouv.agriculture.geojson.Point;
 import fr.gouv.agriculture.geojson.Polygon;
 import fr.gouv.agriculture.graph.DijsktraIteratorFactory;
 import fr.gouv.agriculture.graph.Isochrone;
-import fr.gouv.agriculture.graph.Node;
 import fr.gouv.agriculture.graph.Path;
 import fr.gouv.agriculture.graph.PathElement;
 import fr.gouv.agriculture.graph.ShortestPath;
-import fr.gouv.agriculture.hull.ConcaveHullBuilder;
 import fr.gouv.agriculture.locator.NodeLocator;
 
 
@@ -281,7 +281,7 @@ public class ApiController extends ApiControllerBase implements DisposableBean {
 			public Polygon call() throws Exception {
 				
 				Isochrone processor = new Isochrone(iteratorFactory);
-				List<Node> nodes = processor.isochroneRaw(graph, node, distance);
+				List<Node> nodes = processor.isochrone(graph, node, distance);
 				ConcaveHullBuilder builder = new ConcaveHullBuilder();
 				Polygon polygon = builder.buildHull(nodes);
 				return polygon;

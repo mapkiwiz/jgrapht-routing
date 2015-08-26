@@ -2,7 +2,7 @@ package fr.gouv.agriculture.locator;
 
 import java.util.Collection;
 
-import fr.gouv.agriculture.graph.Node;
+import fr.gouv.agriculture.geo.Node;
 import fr.gouv.agriculture.index.quadtree.QuadTree;
 
 public class IndexNodeLocator implements NodeLocator {

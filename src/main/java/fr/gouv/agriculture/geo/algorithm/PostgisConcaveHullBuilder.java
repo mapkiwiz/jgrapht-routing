@@ -1,4 +1,4 @@
-package fr.gouv.agriculture.hull;
+package fr.gouv.agriculture.geo.algorithm;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +11,10 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import fr.gouv.agriculture.geo.Node;
 import fr.gouv.agriculture.geojson.GeoJsonFormatException;
 import fr.gouv.agriculture.geojson.GeoJsonObject;
 import fr.gouv.agriculture.geojson.Polygon;
-import fr.gouv.agriculture.graph.Node;
 
 public class PostgisConcaveHullBuilder implements HullBuilder {
 	

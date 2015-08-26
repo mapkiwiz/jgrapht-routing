@@ -1,10 +1,9 @@
-package fr.gouv.agriculture.graph.utils;
+package fr.gouv.agriculture.geo;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import fr.gouv.agriculture.geojson.Polygon;
-import fr.gouv.agriculture.graph.Node;
 
 public class NodeUtils {
 

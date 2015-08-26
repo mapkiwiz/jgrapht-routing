@@ -1,11 +1,11 @@
-package fr.gouv.agriculture.hull;
+package fr.gouv.agriculture.geo.algorithm;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.gouv.agriculture.geo.Node;
+import fr.gouv.agriculture.geo.NodeUtils;
 import fr.gouv.agriculture.geojson.Polygon;
-import fr.gouv.agriculture.graph.Node;
-import fr.gouv.agriculture.graph.utils.NodeUtils;
 import fr.gouv.agriculture.index.quadtree.QuadTree;
 
 public class ConcaveHullBuilder implements HullBuilder {

@@ -6,8 +6,8 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import fr.gouv.agriculture.geo.Node;
 import fr.gouv.agriculture.geojson.Point;
-import fr.gouv.agriculture.graph.Node;
 
 public abstract class ApiControllerBase {
 	
