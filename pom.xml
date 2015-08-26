@@ -2,7 +2,13 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>fr.gouv.agriculture.demo</groupId>
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>9</version>
+	</parent>
+
+	<groupId>com.github.mapkiwiz</groupId>
 	<artifactId>routing-jgrapht</artifactId>
 	<version>0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
@@ -92,7 +98,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.18.1</version>
 				<configuration>
-					<excludedGroups>fr.gouv.agriculture.test.PostgisTest,fr.gouv.agriculture.test.PerformanceTest</excludedGroups>
+					<excludedGroups>com.github.mapkiwiz.test.PostgisTest,com.github.mapkiwiz.test.PerformanceTest</excludedGroups>
 				</configuration>
 			</plugin>
 			<plugin>
