@@ -12,7 +12,8 @@
 	<artifactId>jgrapht-routing-web-api</artifactId>
 	<version>0.3-SNAPSHOT</version>
 	<packaging>war</packaging>
-	<name>REST API and Web example</name>
+	<name>jgrapht-routing-web-api</name>
+	<description>REST API and Web example</description>
 
 	<properties>
 		<spring.security.version>3.2.6.RELEASE</spring.security.version>

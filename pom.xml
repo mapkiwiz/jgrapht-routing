@@ -9,7 +9,8 @@
 	<artifactId>jgrapht-routing</artifactId>
 	<version>0.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>Java Routing Service based on JGraphT</name>
+	<name>jgrapht-routing</name>
+	<description>Java Routing Service based on JGraphT</description>
 	<url>https://github.com/mapkiwiz/jgrapht-routing</url>
 
 	<developers>

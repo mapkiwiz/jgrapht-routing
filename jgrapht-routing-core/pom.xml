@@ -12,7 +12,8 @@
 	<artifactId>jgrapht-routing-core</artifactId>
 	<version>0.3-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>Routing Library</name>
+	<name>jgrapht-routing-core</name>
+	<description>Routing Library</description>
 
 	<profiles>
 	    <profile>
