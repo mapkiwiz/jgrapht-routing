@@ -5,13 +5,14 @@
 
 ## Build and run
 
-This will start a Tomcat container at http://localhost:8080/routing with some test data.
-
-The test data cover the [Rhône-Alpes](https://fr.wikipedia.org/wiki/Rh%C3%B4ne-Alpes) region in France 
-
 ```
 mvn clean install tomcat7:run
 ```
+
+This will start a Tomcat container at http://localhost:8080/routing with some test data.
+
+The test data cover the [Rhône-Alpes](https://fr.wikipedia.org/wiki/Rh%C3%B4ne-Alpes) region in France.
+
 
 ## Example queries
 
