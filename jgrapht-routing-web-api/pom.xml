@@ -1,0 +1,218 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.github.mapkiwiz</groupId>
+		<artifactId>jgrapht-routing</artifactId>
+		<version>0.1-SNAPSHOT</version>
+	</parent>
+
+	<groupId>com.github.mapkiwiz.routing</groupId>
+	<artifactId>jgrapht-routing-web-api</artifactId>
+	<version>${parent.version}</version>
+	<packaging>war</packaging>
+	<name>REST API and Web example</name>
+
+	<properties>
+		<spring.security.version>3.2.6.RELEASE</spring.security.version>
+		<spring.security.oauth.version>2.0.7.RELEASE</spring.security.oauth.version>
+		<angular.version>1.3.15</angular.version>
+		<java.version>1.6</java.version>
+		<m2eclipse.wtp.contextRoot>/routing</m2eclipse.wtp.contextRoot>
+	</properties>
+
+	<profiles>
+		<profile>
+			<id>debug</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.tomcat.maven</groupId>
+						<artifactId>tomcat7-maven-plugin</artifactId>
+						<configuration>
+							<path>/routing</path>
+							<fork>false</fork>
+							<systemProperties>
+								<JAVA_OPTS>-Xmx1024m -Xms256m -XX:MaxPermSize=256m -Xnoagent
+									-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000</JAVA_OPTS>
+							</systemProperties>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>integration</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>2.7.1</version>
+						<executions>
+							<execution>
+								<id>surefire-it</id>
+								<phase>integration-test</phase>
+								<goals>
+									<goal>test</goal>
+								</goals>
+								<configuration>
+									<skip>${skipTests}</skip>
+									<testFailureIgnore>false</testFailureIgnore>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.tomcat.maven</groupId>
+						<artifactId>tomcat7-maven-plugin</artifactId>
+						<version>2.2</version>
+						<executions>
+							<execution>
+								<id>start-tomcat</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<path>/routing</path>
+									<fork>true</fork>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+	<build>
+		<plugins>
+			<plugin>
+				<!--skip install (this is just a test module) -->
+				<artifactId>maven-install-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<!--skip deploy (this is just a test module) -->
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<configuration>
+					<path>/routing</path>
+					<protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
+					<systemProperties>
+						<JAVA_OPTS>-server -Xmx512m -Xms512m -XX:+AggressiveOpts</JAVA_OPTS>
+					</systemProperties>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>jgrapht-routing-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- Import test data -->
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>jgrapht-routing-core</artifactId>
+			<version>${project.version}</version>
+			<classifier>tests</classifier>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${spring.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<!-- <dependency> <groupId>org.springframework.security</groupId> <artifactId>spring-security-taglibs</artifactId> 
+			<version>${spring.security.version}</version> </dependency> <dependency> 
+			<groupId>org.springframework.security.oauth</groupId> <artifactId>spring-security-oauth2</artifactId> 
+			<version>${spring.security.oauth.version}</version> </dependency> -->
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.0.1</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+		</dependency>
+
+		<!-- <dependency> <groupId>org.webjars.bower</groupId> <artifactId>jquery</artifactId> 
+			<version>1.11.0</version> </dependency> <dependency> <groupId>org.webjars.bower</groupId> 
+			<artifactId>bootstrap</artifactId> <version>3.1.1</version> </dependency> 
+			<dependency> <groupId>org.webjars.bower</groupId> <artifactId>angular</artifactId> 
+			<version>${angular.version}</version> </dependency> <dependency> <groupId>org.webjars.bower</groupId> 
+			<artifactId>angular-sanitize</artifactId> <version>${angular.version}</version> 
+			</dependency> <dependency> <groupId>org.webjars.bower</groupId> <artifactId>angular-bootstrap</artifactId> 
+			<version>0.13.0</version> </dependency> <dependency> <groupId>org.webjars.bower</groupId> 
+			<artifactId>jwt-client</artifactId> <version>0.1.0</version> </dependency> -->
+
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>9.3-1103-jdbc4</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.timgroup</groupId>
+			<artifactId>java-statsd-client</artifactId>
+			<version>3.0.1</version>
+		</dependency>
+
+	</dependencies>
+
+</project>
+
