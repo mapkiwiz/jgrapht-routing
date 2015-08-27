@@ -5,12 +5,12 @@
 	<parent>
 		<groupId>com.github.mapkiwiz</groupId>
 		<artifactId>jgrapht-routing</artifactId>
-		<version>0.1-SNAPSHOT</version>
+		<version>0.1</version>
 	</parent>
 
 	<groupId>com.github.mapkiwiz.routing</groupId>
 	<artifactId>jgrapht-routing-core</artifactId>
-	<version>${parent.version}</version>
+	<version>0.1</version>
 	<packaging>jar</packaging>
 	<name>Routing Library</name>
 
