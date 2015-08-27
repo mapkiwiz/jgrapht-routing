@@ -10,7 +10,7 @@
 
 	<groupId>com.github.mapkiwiz</groupId>
 	<artifactId>jgrapht-routing</artifactId>
-	<version>0.2-SNAPSHOT</version>
+	<version>0.1</version>
 	<packaging>pom</packaging>
 	<name>Java Routing Service based on JGraphT</name>
 
@@ -34,7 +34,8 @@
 		<connection>scm:git:ssh:/git@github.com/mapkiwiz/jgrapht-routing.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com/mapkiwiz/jgrapht-routing.git</developerConnection>
 		<url>https://github.com/mapkiwiz/jgrapht-routing</url>
-	</scm>
+	  <tag>0.1</tag>
+  </scm>
 
  <distributionManagement>
    <snapshotRepository>

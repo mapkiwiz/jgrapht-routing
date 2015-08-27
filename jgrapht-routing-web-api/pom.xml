@@ -5,12 +5,12 @@
 	<parent>
 		<groupId>com.github.mapkiwiz</groupId>
 		<artifactId>jgrapht-routing</artifactId>
-		<version>0.2-SNAPSHOT</version>
+		<version>0.1</version>
 	</parent>
 
 	<groupId>com.github.mapkiwiz.routing</groupId>
 	<artifactId>jgrapht-routing-web-api</artifactId>
-	<version>0.2-SNAPSHOT</version>
+	<version>0.1</version>
 	<packaging>war</packaging>
 	<name>REST API and Web example</name>
 
