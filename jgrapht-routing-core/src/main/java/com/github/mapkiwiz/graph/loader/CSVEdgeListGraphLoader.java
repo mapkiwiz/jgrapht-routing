@@ -1,10 +1,11 @@
 package com.github.mapkiwiz.graph.loader;
 
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
@@ -17,34 +18,38 @@ import com.github.mapkiwiz.geo.Node;
 
 public class CSVEdgeListGraphLoader extends AbstractEdgeListGraphLoader {
 	
-	private final String edgeFilename;
-	private final String nodeFilename;
+	private final URL edgeFileURL;
+	private final URL nodeFileURL;
 	private final CSVFormat format;
 	
-	public CSVEdgeListGraphLoader(String nodeFilename, String edgeFilename) {
-		this(nodeFilename, edgeFilename, '\t');
+	public CSVEdgeListGraphLoader(String nodeFilename, String edgeFilename) throws MalformedURLException {
+		this(new URL("file://" + nodeFilename), new URL("file://" + edgeFilename), '\t');
 	}
 	
-	public CSVEdgeListGraphLoader(String nodeFilename, String edgeFilename, char delimiter) {
-		assert(nodeFilename != null && edgeFilename != null);
-		this.nodeFilename = nodeFilename;
-		this.edgeFilename = edgeFilename;
+	public CSVEdgeListGraphLoader(URL nodeFileURL, URL edgeFileURL) {
+		this(nodeFileURL, edgeFileURL, '\t');
+	}
+	
+	public CSVEdgeListGraphLoader(URL nodeFileURL, URL edgeFileURL, char delimiter) {
+		assert(nodeFileURL != null && edgeFileURL != null);
+		this.nodeFileURL = nodeFileURL;
+		this.edgeFileURL = edgeFileURL;
 		this.format = CSVFormat.newFormat(delimiter).withSkipHeaderRecord(true);
 	}
 	
-	private Reader getReader(String filename) throws IOException {
-		if (filename.endsWith(".gz")) {
-			FileInputStream in = new FileInputStream(filename);
+	private Reader getReader(URL url) throws IOException {
+		if (url.getFile().endsWith(".gz")) {
+			InputStream in = url.openStream();
 			GZIPInputStream gis = new GZIPInputStream(in);
 			return new InputStreamReader(gis);
 		} else {
-			return new FileReader(filename);
+			return new InputStreamReader(url.openStream());
 		}
 	}
 	
 	public Iterator<Node> getNodeIterator() throws IOException {
 		
-		Reader reader = getReader(nodeFilename);
+		Reader reader = getReader(nodeFileURL);
 		Iterable<CSVRecord> records = format.withHeader("ID", "LON", "LAT").parse(reader);
 		final Iterator<CSVRecord> recordIterator = records.iterator();
 		
@@ -68,7 +73,7 @@ public class CSVEdgeListGraphLoader extends AbstractEdgeListGraphLoader {
 	
 	public Iterator<EdgeData> getEdgeIterator() throws IOException {
 		
-		Reader reader = getReader(edgeFilename);
+		Reader reader = getReader(edgeFileURL);
 		Iterable<CSVRecord> records = format.withHeader("SOURCE", "TARGET", "WEIGHT", "DATA").parse(reader);
 		final Iterator<CSVRecord> recordIterator = records.iterator();
 		

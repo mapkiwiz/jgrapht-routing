@@ -1,6 +1,7 @@
 package com.github.mapkiwiz.web.config;
 
 import java.io.IOException;
+import java.net.URL;
 
 import javax.sql.DataSource;
 
@@ -15,7 +16,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import com.github.mapkiwiz.geo.Node;
 import com.github.mapkiwiz.graph.DijsktraIteratorFactory;
 import com.github.mapkiwiz.graph.PriorityQueueDijkstraIterator;
-import com.github.mapkiwiz.graph.loader.JdbcEdgeListGraphLoader;
+import com.github.mapkiwiz.graph.loader.CSVEdgeListGraphLoader;
 import com.github.mapkiwiz.locator.IndexNodeLocator;
 import com.github.mapkiwiz.locator.NodeLocator;
 
@@ -47,18 +48,24 @@ public class RoadGraphConfig {
 	@Bean
 	public Graph<Node, DefaultWeightedEdge> roadGraph(DataSource dataSource) throws IOException {
 		
-		LOGGER.info("Loading road graph from JDBC connection");
+//		LOGGER.info("Loading road graph from JDBC connection");
+//		
+//		String nodeTemplateQuery = "SELECT n.id, st_x(n.geom) AS lon, st_y(n.geom) AS lat " +
+//				" FROM (SELECT id, st_transform(the_geom, 4326) AS geom" +
+//				" FROM bdtopo.routes_vertices_pgr ORDER BY id) n;";
+//		
+//		String edgeTemplateQuery = "SELECT source, target, cost AS weight FROM bdtopo.routes ORDER BY source, target";
+//		
+//		JdbcEdgeListGraphLoader loader = new JdbcEdgeListGraphLoader(
+//				dataSource,
+//				nodeTemplateQuery,
+//				edgeTemplateQuery);
 		
-		String nodeTemplateQuery = "SELECT n.id, st_x(n.geom) AS lon, st_y(n.geom) AS lat " +
-				" FROM (SELECT id, st_transform(the_geom, 4326) AS geom" +
-				" FROM bdtopo.routes_vertices_pgr ORDER BY id) n;";
+		LOGGER.info("Loading road graph from local TSV files");
 		
-		String edgeTemplateQuery = "SELECT source, target, cost AS weight FROM bdtopo.routes ORDER BY source, target";
-		
-		JdbcEdgeListGraphLoader loader = new JdbcEdgeListGraphLoader(
-				dataSource,
-				nodeTemplateQuery,
-				edgeTemplateQuery);
+		URL nodeFileURL = getClass().getClassLoader().getResource("large.nodes.tsv.gz");
+		URL edgeFileURL = getClass().getClassLoader().getResource("large.edges.tsv.gz");
+		CSVEdgeListGraphLoader loader = new CSVEdgeListGraphLoader(nodeFileURL, edgeFileURL);
 		
 		Graph<Node, DefaultWeightedEdge> graph = loader.loadGraph();
 		

@@ -3,6 +3,7 @@ package com.github.mapkiwiz.graph;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
 
@@ -26,8 +27,8 @@ public abstract class AbstractGraphTest {
 	
 	public Graph<Node, DefaultWeightedEdge> loadSmallGraph() {
 		
-		String node_file = getClass().getClassLoader().getResource("test.nodes.tsv").getPath();
-		String edge_file = getClass().getClassLoader().getResource("test.edges.tsv").getPath();
+		URL node_file = getClass().getClassLoader().getResource("test.nodes.tsv");
+		URL edge_file = getClass().getClassLoader().getResource("test.edges.tsv");
 
 		CSVEdgeListGraphLoader graphLoader = new CSVEdgeListGraphLoader(node_file, edge_file);
 		Graph<Node, DefaultWeightedEdge> graph;
@@ -48,8 +49,8 @@ public abstract class AbstractGraphTest {
 	
 	public Graph<Node, DefaultWeightedEdge> loadLargeGraph() {
 		
-		String nodeFile = getClass().getClassLoader().getResource("large.nodes.tsv.gz").getFile();
-		String edgeFile = getClass().getClassLoader().getResource("large.edges.tsv.gz").getFile();
+		URL nodeFile = getClass().getClassLoader().getResource("large.nodes.tsv.gz");
+		URL edgeFile = getClass().getClassLoader().getResource("large.edges.tsv.gz");
 		CSVEdgeListGraphLoader graphLoader = new CSVEdgeListGraphLoader(nodeFile, edgeFile);
 		Graph<Node, DefaultWeightedEdge> graph;
 		
