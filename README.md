@@ -82,7 +82,8 @@ Returns GeoJSON LineString.
 
 ### 30 km isochrone around Valence :
 ```
-http GET :8080/routing/api/v1/isochrone lon==4.890021 lat==44.930435 distance==30000 concave==true
+http GET :8080/routing/api/v1/isochrone lon==4.890021 lat==44.930435 \
+distance==30000 concave==true
 ```
 Returns GeoJSON Polygon.
 
