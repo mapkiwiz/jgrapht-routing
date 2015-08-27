@@ -10,7 +10,7 @@
 
 	<groupId>com.github.mapkiwiz</groupId>
 	<artifactId>jgrapht-routing</artifactId>
-	<version>0.1</version>
+	<version>0.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Java Routing Service based on JGraphT</name>
 
@@ -35,6 +35,19 @@
 		<developerConnection>scm:git:ssh://git@github.com/mapkiwiz/jgrapht-routing.git</developerConnection>
 		<url>https://github.com/mapkiwiz/jgrapht-routing</url>
 	</scm>
+
+ <distributionManagement>
+   <snapshotRepository>
+     <id>ossrh-snaphsots</id>
+     <name>Sonatype Snaphsots</name>
+     <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+   </snapshotRepository>
+   <repository>
+     <id>ossrh</id>
+     <name>Sonatype Staging</name>
+     <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+   </repository>
+ </distributionManagement>
 
 	<properties>
 	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
