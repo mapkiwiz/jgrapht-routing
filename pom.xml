@@ -117,13 +117,24 @@
 						<failOnMissingWebXml>false</failOnMissingWebXml>
 					</configuration>
 				</plugin>
+				<plugin>
+  					<groupId>org.apache.maven.plugins</groupId>
+  					<artifactId>maven-release-plugin</artifactId>
+  					<version>2.5</version>
+  					<configuration>
+    						<autoVersionSubmodules>true</autoVersionSubmodules>
+    						<useReleaseProfile>true</useReleaseProfile>
+    						<releaseProfiles>release</releaseProfiles>
+    						<goals>deploy</goals>
+  					</configuration>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
 
 	<profiles>
 		<profile>
-			<id>sonatype-oss-release</id>
+			<id>release</id>
 			<build>
   <plugins>
     <plugin>
