@@ -1,11 +1,12 @@
 # Java Routing Machine implemented on JGraphT
 
 ![Build status](https://travis-ci.org/mapkiwiz/jgrapht-routing.svg)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.mapkiwiz/jgrapht-routing/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/com.github.mapkiwiz/jgrapht-routing)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.mapkiwiz/jgrapht-routing/badge.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/com.github.mapkiwiz/jgrapht-routing)
 
 ## Build and run
 
 This will start a Tomcat container at http://localhost:8080/routing with some test data.
+
 The test data cover the [Rhône-Alpes](https://fr.wikipedia.org/wiki/Rh%C3%B4ne-Alpes) region in France 
 
 ```
@@ -81,14 +82,6 @@ http GET :8080/routing/api/v1/isochrone lon==4.890021 lat==44.930435 distance==3
 ```
 Returns GeoJSON Polygon.
 
-## Feeding in your own data
-
-TODO
-
-## Getting data from OpenStreetMap
-
-TODO
-
 ## Using as a library
 
 Add the following dependency to your project pom.xml :
@@ -100,3 +93,11 @@ Add the following dependency to your project pom.xml :
   <version>0.4</version>
 </dependency>
 ```
+
+## Feeding in your own data
+
+TODO
+
+## Getting data from OpenStreetMap
+
+TODO
