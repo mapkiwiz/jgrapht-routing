@@ -9,10 +9,32 @@
 	</parent>
 
 	<groupId>com.github.mapkiwiz</groupId>
-	<artifactId>routing-jgrapht</artifactId>
+	<artifactId>jgrapht-routing</artifactId>
 	<version>0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
-	<name>Basic Routing Service base on JGraphT</name>
+	<name>Java Routing Service base on JGraphT</name>
+
+	<developers>
+		<developer>
+			<name>Christophe ROUSSON</name>
+			<email>mapkiwiz@gmail.com</email>
+			<organization>MapKiwiz</organization>
+			<organizationUrl>http://github.com/mapkiwiz</organizationUrl>
+		</developer>
+	</developers>
+	
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>http://www.opensource.org/licenses/mit-license.php</url>
+		</license>
+	</licenses>
+
+	<scm>
+		<connection>scm:git:git@github.com:mapkiwiz/jgrapht-routing.git</connection>
+		<developerConnection>scm:git:git@github.com:mapkiwiz/jgrapht-routing.git</developerConnection>
+		<url>https://github.com/mapkiwiz/jgrapht-routing</url>
+	</scm>
 
 	<properties>
 	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -32,7 +54,6 @@
 	    			<plugin>
 				        <groupId>org.apache.tomcat.maven</groupId>
 				        <artifactId>tomcat7-maven-plugin</artifactId>
-				        <version>2.2</version>
 				        <configuration>
 				          <path>/routing</path>
 						  <fork>false</fork>
@@ -80,8 +101,6 @@
 								<configuration>
 									<path>/routing</path>
 									<fork>true</fork>
-									<serverXml>server.xml</serverXml>
-									<useSeparateTomcatClassLoader>true</useSeparateTomcatClassLoader>
 								</configuration>
 							</execution>
 						</executions>
@@ -96,17 +115,8 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.18.1</version>
 				<configuration>
 					<excludedGroups>com.github.mapkiwiz.test.PostgisTest,com.github.mapkiwiz.test.PerformanceTest</excludedGroups>
-				</configuration>
-			</plugin>
-			<plugin>
-				<!--skip deploy (this is just a test module) -->
-				<artifactId>maven-deploy-plugin</artifactId>
-				<version>2.6</version>
-				<configuration>
-					<skip>true</skip>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -123,6 +133,11 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.18.1</version>
+				</plugin>
 				<plugin>
 					<groupId>org.apache.tomcat.maven</groupId>
 					<artifactId>tomcat7-maven-plugin</artifactId>
