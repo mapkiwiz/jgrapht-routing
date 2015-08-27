@@ -19,7 +19,8 @@ Test data are in geographic coordinates (WGS84, epsg:4326) with time(cost) = dis
 
 Using [HTTPie](https://github.com/jkbrzt/httpie) client :
 
-Locate nearest network node around Lyon (4.834413,45.767304) :
+### Locate nearest network node around Lyon (4.834413,45.767304) :
+
 ```
 http GET :8080/routing/api/v1/distance lon==4.834413 lat==45.767304
 ```
@@ -42,7 +43,8 @@ Returns a GeoJSON Point :
 }
 ```
 
-Distance from Lyon (4.834413,45.767304) to Valence (4.890021,44.930435) :
+### Distance from Lyon (4.834413,45.767304) to Valence (4.890021,44.930435) :
+
 ```
 http GET :8080/routing/api/v1/distance source==4.834413,45.767304 target==4.890021,44.930435
 ```
@@ -70,13 +72,14 @@ Returns :
 }
 ```
 
-Route from Lyon to Valence :
+### Route from Lyon to Valence :
+
 ```
 http GET :8080/routing/api/v1/route source==4.834413,45.767304 target==4.890021,44.930435
 ```
 Returns GeoJSON LineString.
 
-30 km isochrone around Valence :
+### 30 km isochrone around Valence :
 ```
 http GET :8080/routing/api/v1/isochrone lon==4.890021 lat==44.930435 distance==30000 concave==true
 ```
