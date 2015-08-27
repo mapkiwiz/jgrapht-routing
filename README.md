@@ -1,4 +1,4 @@
-# Java Routing Machine implemented on JGraphT
+# Java Routing Machine
 
 ![Build status](https://travis-ci.org/mapkiwiz/jgrapht-routing.svg)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.mapkiwiz/jgrapht-routing/badge.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/com.github.mapkiwiz/jgrapht-routing)
