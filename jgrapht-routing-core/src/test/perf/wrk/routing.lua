@@ -36,7 +36,7 @@ function init(args)
       random_points[n] = p
       n = n + 1
     end
-    i = math.random(n) -- start at random point in random_points
+    i = 1 + math.random(n) -- start at random point in random_points
     -- statsd:gauge('client.threads', '+1')
 end
 
@@ -45,7 +45,7 @@ function delay()
 end
 
 function nexti()
-   if i == n then
+   if i >= n then
       i = 1 -- skip header line
    else
       i = i + 1
