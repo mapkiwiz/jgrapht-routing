@@ -5,6 +5,8 @@
 
 ## Build and run
 
+Using Maven 2/3 :
+
 ```
 mvn clean install tomcat7:run
 ```
@@ -12,11 +14,10 @@ mvn clean install tomcat7:run
 This will start a Tomcat container at http://localhost:8080/routing with some test data.
 
 The test data cover the [Rhône-Alpes](https://fr.wikipedia.org/wiki/Rh%C3%B4ne-Alpes) region in France.
+Test data are in geographic coordinates (WGS84, epsg:4326) with time(cost) = distance (meters).
 
 
 ## Example queries
-
-Test data are in geographic coordinates (WGS84, epsg:4326) with time(cost) = distance (meters).
 
 Using [HTTPie](https://github.com/jkbrzt/httpie) client :
 
