@@ -2,18 +2,24 @@
 
 ## Prerequisites
 
-1. Build and install ``wrk``
-   https://github.com/wg/wrk
+Build and install ``wrk``
+
+```   
+git clone https://github.com/wg/wrk
+cd wrk
+make
+sudo make install
+```
 
 If you wand to record statistics during test execution :
 
-2. Install statsd
+Install statsd :
 
 ```
 npm install statsd
 ```
 
-3. Install graphite
+Install graphite :
 
 ```
 pip install graphite-web
