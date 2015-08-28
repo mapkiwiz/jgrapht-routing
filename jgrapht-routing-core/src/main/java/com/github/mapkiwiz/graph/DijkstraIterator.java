@@ -13,5 +13,7 @@ public interface DijkstraIterator<V> extends Iterator<V> {
 	public PathElement<V> getPathElement(V vertex);
 	
 	public Path<V> getPath(V vertex);
+	
+	public boolean isSettled(V vertex);
 
 }

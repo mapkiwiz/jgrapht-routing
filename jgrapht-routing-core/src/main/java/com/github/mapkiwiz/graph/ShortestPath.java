@@ -90,29 +90,23 @@ public class ShortestPath {
 		DijkstraIterator<V> reverseIterator =
 				this.iteratorFactory.create(graph, target);
 
-		Set<V> forwardSet = new HashSet<V>();
-		Set<V> reverseSet = new HashSet<V>();
 		V middlePoint = null;
 
 		while (forwardIterator.hasNext() && reverseIterator.hasNext()) {
 
 			if (forwardIterator.hasNext()) {
 				V next = forwardIterator.next();
-				if (reverseSet.contains(next)) {
+				if (reverseIterator.isSettled(next)) {
 					middlePoint = next;
 					break;
-				} else {
-					forwardSet.add(next);
 				}
 			}
 
 			if (reverseIterator.hasNext()) {
 				V next = reverseIterator.next();
-				if (forwardSet.contains(next)) {
+				if (forwardIterator.isSettled(next)) {
 					middlePoint = next;
 					break;
-				} else {
-					reverseSet.add(next);
 				}
 			}
 		}

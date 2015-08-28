@@ -74,4 +74,8 @@ public class FibonacciHeapDijkstraIterator<V,E> implements DijkstraIterator<V> {
 		
 	}
 
+	public boolean isSettled(V vertex) {
+		return (this.iterator.getShortestPathLength(vertex) < Double.POSITIVE_INFINITY);
+	}
+
 }

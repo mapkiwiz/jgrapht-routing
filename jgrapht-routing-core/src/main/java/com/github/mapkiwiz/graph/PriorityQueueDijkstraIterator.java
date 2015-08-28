@@ -26,6 +26,17 @@ public class PriorityQueueDijkstraIterator<V,E> implements DijkstraIterator<V> {
 		
 	}
 	
+	public boolean isSettled(V vertex) {
+		
+		QueueEntry<V> entry = this.seen.get(vertex);
+		if (entry != null) {
+			return entry.frozen;
+		} else {
+			return false;
+		}
+	
+	}
+	
 	public boolean hasNext() {
 		
 		if (this.next == null) {
