@@ -36,6 +36,12 @@ gunicorn wsgi &
 cd -
 ```
 
+Start Tomcat :
+
+```
+mvn clean install tomcat7:run 
+```
+
 Run the tests with 5 concurrent threads for 10 minutes :
 
 ```
