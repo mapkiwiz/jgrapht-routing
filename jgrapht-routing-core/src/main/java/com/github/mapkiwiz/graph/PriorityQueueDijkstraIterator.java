@@ -13,6 +13,8 @@ public class PriorityQueueDijkstraIterator<V,E> implements DijkstraIterator<V> {
 	private final Graph<V,E> graph;
 	private final Map<V, QueueEntry<V>> seen;
 	private QueueEntry<V> next;
+	private int maxNodeLimit = -1;
+	private int nodeCount = 0;
 	
 	public PriorityQueueDijkstraIterator(Graph<V,E> graph, V source) {
 		
@@ -24,6 +26,10 @@ public class PriorityQueueDijkstraIterator<V,E> implements DijkstraIterator<V> {
 		this.seen.put(source, entry);
 		this.next = null;
 		
+	}
+	
+	public void setMaxNodeLimit(int maxNodeLimit) {
+		this.maxNodeLimit = maxNodeLimit;
 	}
 	
 	public boolean isSettled(V vertex) {
@@ -49,6 +55,10 @@ public class PriorityQueueDijkstraIterator<V,E> implements DijkstraIterator<V> {
 	
 	private boolean moveToNext() {
 		
+		if (maxNodeLimit > 0 && nodeCount > maxNodeLimit) {
+			return false;
+		}
+		
 		QueueEntry<V> next = this.heap.poll();
 		
 		while (next != null && next.duplicate) {
@@ -56,9 +66,14 @@ public class PriorityQueueDijkstraIterator<V,E> implements DijkstraIterator<V> {
 		}
 		
 		this.next = next;
+		nodeCount++;
 		
 		return (next != null);
 		
+	}
+	
+	public boolean isAccessible(V toNode, V fromNode, E edge) {
+		return true;
 	}
 
 	public V next() {
@@ -70,6 +85,10 @@ public class PriorityQueueDijkstraIterator<V,E> implements DijkstraIterator<V> {
 		for (E edge : graph.edgesOf(this.next.vertex)) {
 			
 			V vertex = Graphs.getOppositeVertex(graph, edge, this.next.vertex);
+			if (!isAccessible(vertex, this.next.vertex, edge)) {
+				continue;
+			}
+			
 			double path_element_weight = graph.getEdgeWeight(edge);
 			double weight = this.next.weight + path_element_weight;
 			

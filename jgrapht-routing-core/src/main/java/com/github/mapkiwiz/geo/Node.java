@@ -64,7 +64,7 @@ public class Node implements Serializable, CrossProduct<Node> {
 	}
 	
 	public String toString() {
-		return "ID: " + id + " (" + lon + "," + lat + ")";
+		return getClass().getSimpleName() + " " + id + " (" + lon + "," + lat + ")";
 	}
 
 }

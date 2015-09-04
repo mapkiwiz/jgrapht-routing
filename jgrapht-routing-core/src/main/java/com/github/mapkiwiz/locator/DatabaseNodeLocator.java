@@ -11,7 +11,7 @@ import org.springframework.jdbc.core.RowMapper;
 import com.github.mapkiwiz.geo.Node;
 
 
-public class DatabaseNodeLocator implements NodeLocator {
+public class DatabaseNodeLocator implements NodeLocator<Node> {
 	
 	private final DataSource dataSource;
 	private final String templateQuery;

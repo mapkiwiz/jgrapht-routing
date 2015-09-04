@@ -8,14 +8,15 @@ import com.github.mapkiwiz.geo.LexicographicNodeComparator;
 import com.github.mapkiwiz.geo.Node;
 
 
-public class ConvexHullBuilder implements HullBuilder {
+public class ConvexHullBuilder<V extends Node> implements HullBuilder<V> {
 	
-	public static List<Node> convexHull(List<Node> nodes) {
+	@SuppressWarnings("unchecked")
+	public static <V extends Node> List<V> convexHull(List<V> nodes) {
 		
 		assert(nodes.size() > 0);
 		
 		if (nodes.size() <= 3) {
-			return new ArrayList<Node>(nodes);
+			return new ArrayList<V>(nodes);
 		}
 		
 		Collections.sort(nodes, new LexicographicNodeComparator());
@@ -23,7 +24,7 @@ public class ConvexHullBuilder implements HullBuilder {
 		
 		// lower hull
 		int k = 0;
-		for (Node n : nodes) {
+		for (V n : nodes) {
 			
 			while (k >= 2 && cross(hull[k-2], hull[k-1], n) <= 0) {
 				k--;
@@ -35,7 +36,7 @@ public class ConvexHullBuilder implements HullBuilder {
 		// upper hull
 		for (int i=nodes.size()-2, t = k + 1; i >= 0; i--) {
 			
-			Node n = nodes.get(i);
+			V n = nodes.get(i);
 			while (k >= t && cross(hull[k-2], hull[k-1], n) <= 0) {
 				k--;
 			}
@@ -44,9 +45,9 @@ public class ConvexHullBuilder implements HullBuilder {
 		}
 		
 		if (k > 1) {
-			List<Node> results = new ArrayList<Node>();
+			List<V> results = new ArrayList<V>();
 			for (int i=0; i<k; i++) { // i<k : include origin twice to form ring
-				results.add(hull[i]);
+				results.add((V) hull[i]);
 			}
 			return results;
 		}
@@ -59,7 +60,7 @@ public class ConvexHullBuilder implements HullBuilder {
 		return o.cross(a, b);
 	}
 
-	public List<Node> buildHull(List<Node> nodes) {
+	public List<V> buildHull(List<V> nodes) {
 		
 		return convexHull(nodes);
 		

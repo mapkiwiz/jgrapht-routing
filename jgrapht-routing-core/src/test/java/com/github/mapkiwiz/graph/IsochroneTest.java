@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import com.github.mapkiwiz.geo.Node;
 import com.github.mapkiwiz.geo.NodeUtils;
+import com.github.mapkiwiz.geo.algorithm.ConcaveHullBuilder;
 import com.github.mapkiwiz.geo.algorithm.ConvexHullBuilder;
 import com.github.mapkiwiz.geojson.Feature;
 import com.github.mapkiwiz.geojson.FeatureCollection;
@@ -49,7 +50,7 @@ public class IsochroneTest extends AbstractGraphTest {
 		
 //		Node source = getNode(LYON_NODE_ID);
 		Node source = getNode(VALENCE_NODE_ID);
-		double distance = 30000.0; // 30 km
+		double distance = 50000.0; // 30 km
 		
 		long start = System.currentTimeMillis();
 		Isochrone processor =
@@ -69,6 +70,11 @@ public class IsochroneTest extends AbstractGraphTest {
 		System.out.println(feature.toGeoJSON());
 		System.out.println("Isochrone nodes : " + isochrone.size());
 		System.out.println("Duration : " + (duration / 1000.0));
+		
+		ConcaveHullBuilder<Node> concaveHullBuilder = new ConcaveHullBuilder<Node>();
+		List<Node> concaveHull = concaveHullBuilder.buildHull(isochrone);
+		System.out.println("Concave Hull size : " + concaveHull.size());
+		System.out.println(NodeUtils.asPolygon(concaveHull).toGeoJSON());
 		
 	}
 	

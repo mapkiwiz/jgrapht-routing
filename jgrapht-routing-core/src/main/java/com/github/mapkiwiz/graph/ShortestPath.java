@@ -1,9 +1,7 @@
 package com.github.mapkiwiz.graph;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.jgrapht.Graph;
@@ -116,29 +114,6 @@ public class ShortestPath {
 		} else {
 			return 0.0;
 		}
-	}
-
-	public <V, E> List<V> searchByDistance(Graph<V, E> graph, V source, double distance) {
-
-		DijkstraIterator<V> iterator =
-				this.iteratorFactory.create(graph, source);
-		List<V> results = new ArrayList<V>();
-
-		while (iterator.hasNext()) {
-
-			V currentNode = iterator.next();
-			double currentDistance = iterator.getShortestPathLength(currentNode);
-
-			if (currentDistance > distance) {
-				break;
-			}
-
-			results.add(currentNode);
-
-		}
-
-		return results;
-
 	}
 
 }

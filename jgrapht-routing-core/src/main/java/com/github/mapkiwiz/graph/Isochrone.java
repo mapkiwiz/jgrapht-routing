@@ -9,18 +9,18 @@ import org.jgrapht.Graph;
 public class Isochrone {
 	
 	private final DijsktraIteratorFactory iteratorFactory;
-	private final ShortestPath shortestPath;
+	private final SearchByDistance searchByDistance;
 	
 	public Isochrone(DijsktraIteratorFactory factory) {
 		this.iteratorFactory = factory;
-		this.shortestPath = new ShortestPath(factory);
+		this.searchByDistance = new SearchByDistance(factory);
 	}
 	
 	public <E,V> List<V> isochrone(Graph<V, E> graph, V source, double distance) {
 		
 		assert(distance > 0);
 		
-		List<V> nodes = shortestPath.searchByDistance(graph, source, distance);
+		List<V> nodes = searchByDistance.search(graph, source, distance);
 		return nodes;
 		
 	}

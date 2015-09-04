@@ -8,7 +8,7 @@ import com.github.mapkiwiz.geojson.Polygon;
 
 public class NodeUtils {
 
-	public static double length(List<Node> ring) {
+	public static <V extends Node> double length(List<V> ring) {
 
 		double length = 0.0;
 		for (int i=0; i<ring.size()-1; i++) {
@@ -27,7 +27,7 @@ public class NodeUtils {
 				Math.pow(p2.lat - p1.lat, 2));
 	}
 	
-	public static Polygon asPolygon(List<Node> nodes) {
+	public static <V extends Node> Polygon asPolygon(List<V> nodes) {
 		
 		assert(nodes.get(0).equals(nodes.get(nodes.size() -1)));
 		

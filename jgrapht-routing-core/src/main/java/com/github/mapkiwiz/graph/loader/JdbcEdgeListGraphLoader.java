@@ -10,6 +10,9 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleWeightedGraph;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -18,7 +21,7 @@ import com.github.mapkiwiz.geo.Node;
 
 
 
-public class JdbcEdgeListGraphLoader extends AbstractEdgeListGraphLoader {
+public class JdbcEdgeListGraphLoader extends AbstractEdgeListGraphLoader<Node, DefaultWeightedEdge, Long> {
 
 	private final DataSource dataSource;
 	private final String nodeTemplateQuery;
@@ -93,6 +96,24 @@ public class JdbcEdgeListGraphLoader extends AbstractEdgeListGraphLoader {
 	@Override
 	public Map<Long, Node> getNodeMap() {
 		return nodeMap;
+	}
+	
+	@Override
+	public Graph<Node, DefaultWeightedEdge> createNewGraph() {
+		return new SimpleWeightedGraph<Node, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+	}
+
+	@Override
+	public Long getNodeId(Node node) {
+		return node.id;
+	}
+
+	@Override
+	public void addEdge(Graph<Node, DefaultWeightedEdge> graph, Node source, Node target, double weight) {
+		
+		DefaultWeightedEdge edge = graph.addEdge(source, target);
+		((SimpleWeightedGraph<Node, DefaultWeightedEdge>) graph).setEdgeWeight(edge, weight);
+		
 	}
 
 }

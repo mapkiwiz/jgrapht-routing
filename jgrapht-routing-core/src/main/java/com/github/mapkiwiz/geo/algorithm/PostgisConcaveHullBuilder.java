@@ -17,7 +17,7 @@ import com.github.mapkiwiz.geojson.GeoJsonObject;
 import com.github.mapkiwiz.geojson.Polygon;
 
 
-public class PostgisConcaveHullBuilder implements HullBuilder {
+public class PostgisConcaveHullBuilder implements HullBuilder<Node> {
 	
 	private final DataSource dataSource;
 	private long duration_loading = 0L;

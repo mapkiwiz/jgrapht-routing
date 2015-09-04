@@ -8,7 +8,7 @@ import com.github.mapkiwiz.geo.NodeUtils;
 import com.github.mapkiwiz.index.quadtree.QuadTree;
 
 
-public class ConcaveHullBuilder implements HullBuilder {
+public class ConcaveHullBuilder<V extends Node> implements HullBuilder<V> {
 	
 	private long duration_index;
 	private long duration_hull;
@@ -30,7 +30,7 @@ public class ConcaveHullBuilder implements HullBuilder {
 		return this.maxIteration;
 	}
 
-	public List<Node> buildHull(List<Node> nodes) {
+	public List<V> buildHull(List<V> nodes) {
 		
 		if (nodes.size() <= 4) {
 			return null;
@@ -38,15 +38,15 @@ public class ConcaveHullBuilder implements HullBuilder {
 		
 		long start = System.currentTimeMillis();
 		
-		QuadTree<Node> tree = new QuadTree<Node>(-180.0, -90.0, 180.0, 90.0);
-		for (Node n : nodes) {
+		QuadTree<V> tree = new QuadTree<V>(-180.0, -90.0, 180.0, 90.0);
+		for (V n : nodes) {
 			tree.set(n.lon, n.lat, n);
 		}
 		
 		duration_index = System.currentTimeMillis() - start;
 		
-		List<Node> convexHull = ConvexHullBuilder.convexHull(nodes);
-		List<Node> concaveHull = convexHull;
+		List<V> convexHull = ConvexHullBuilder.convexHull(nodes);
+		List<V> concaveHull = convexHull;
 		int i = 0;
 		int numberOfNodes;
 		int currentNumberOfNodes = concaveHull.size()-1;
@@ -63,17 +63,17 @@ public class ConcaveHullBuilder implements HullBuilder {
 		
 	}
 	
-	private List<Node> refine(List<Node> ring, QuadTree<Node> tree) {
+	private List<V> refine(List<V> ring, QuadTree<V> tree) {
 		
 		double convexHullLength = NodeUtils.length(ring);
 		double maxSegmentLength = convexHullLength / Math.min(2 * ring.size(), 1000);
 		double searchDistance = convexHullLength / ring.size() * 2;
 //		System.out.println("Search distance : " + searchDistance);
 		
-		List<Node> result = new ArrayList<Node>();
+		List<V> result = new ArrayList<V>();
 		
 		for (Double[] p : segmentize(ring, maxSegmentLength)) {
-			Node nearest = tree.nearest(p[0], p[1], searchDistance);
+			V nearest = tree.nearest(p[0], p[1], searchDistance);
 			if (nearest != null) {
 				result.add(nearest);
 			}
@@ -86,7 +86,7 @@ public class ConcaveHullBuilder implements HullBuilder {
 		
 	}
 	
-	private List<Double[]> segmentize(List<Node> ring, double maxSegmentLength) {
+	private List<Double[]> segmentize(List<V> ring, double maxSegmentLength) {
 		
 //		System.out.println("Segmentize input size = " + ring.size());
 		List<Double[]> points = new ArrayList<Double[]>();

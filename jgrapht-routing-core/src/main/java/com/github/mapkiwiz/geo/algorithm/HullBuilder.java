@@ -5,8 +5,8 @@ import java.util.List;
 import com.github.mapkiwiz.geo.Node;
 
 
-public interface HullBuilder {
+public interface HullBuilder<V extends Node> {
 	
-	public List<Node> buildHull(List<Node> nodes);
+	public List<V> buildHull(List<V> nodes);
 
 }
