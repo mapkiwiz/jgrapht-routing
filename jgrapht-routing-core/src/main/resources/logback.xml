@@ -1,0 +1,19 @@
+<configuration>
+
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder 
+			by default -->
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<root level="error">
+		<appender-ref ref="CONSOLE" />
+	</root>
+	
+	<logger name="com.github.mapkiwiz.routing" level="info" additivity="false">
+		<appender-ref ref="CONSOLE" />
+	</logger>
+	
+</configuration>

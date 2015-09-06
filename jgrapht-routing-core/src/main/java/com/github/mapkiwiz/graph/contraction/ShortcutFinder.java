@@ -10,6 +10,9 @@ import com.github.mapkiwiz.graph.DijkstraIterator;
 import com.github.mapkiwiz.graph.PriorityQueueDijkstraIterator;
 
 public class ShortcutFinder {
+	
+	public static final int DEFAULT_MAX_NODE_LIMIT = 1000;
+	public int maxNodeLimit = DEFAULT_MAX_NODE_LIMIT;
 
 	public void findShortcuts(PreparedGraph graph, PreparedNode node, int minLevel, ShortcutFinderListener listener) {
 
@@ -32,7 +35,8 @@ public class ShortcutFinder {
 					new PriorityQueueDijkstraIterator<PreparedNode, PreparedEdge>(
 							graph.filter().ignore(node).minLevel(minLevel),
 							inNode);
-			iterator.setMaxNodeLimit(1000);
+			
+			iterator.setMaxNodeLimit(maxNodeLimit);
 
 			for (PreparedNode outNode : out.keySet()) {
 
@@ -82,7 +86,7 @@ public class ShortcutFinder {
 			return iterator.getShortestPathLength(target);
 		}
 
-		while (iterator.hasNext()) { // TODO restrict search space
+		while (iterator.hasNext()) {
 			PreparedNode next = iterator.next();
 			if (next.equals(target)) {
 				break;
