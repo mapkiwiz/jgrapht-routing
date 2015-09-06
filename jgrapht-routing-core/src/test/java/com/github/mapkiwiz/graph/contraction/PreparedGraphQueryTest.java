@@ -7,12 +7,16 @@ import java.net.URL;
 import java.util.List;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import com.github.mapkiwiz.geo.NodeUtils;
 import com.github.mapkiwiz.geo.algorithm.ConcaveHullBuilder;
 import com.github.mapkiwiz.graph.SearchByDistance;
 import com.github.mapkiwiz.locator.IndexNodeLocator;
+import com.github.mapkiwiz.test.MissingTestDataset;
 
+@MissingTestDataset
+@Category(MissingTestDataset.class)
 public class PreparedGraphQueryTest {
 
 	public PreparedGraph loadLargeGraph() throws IOException {

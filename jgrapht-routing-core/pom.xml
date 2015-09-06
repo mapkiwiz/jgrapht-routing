@@ -42,7 +42,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<excludedGroups>com.github.mapkiwiz.test.PostgisTest,com.github.mapkiwiz.test.PerformanceTest</excludedGroups>
+					<excludedGroups>com.github.mapkiwiz.test.PostgisTest,com.github.mapkiwiz.test.PerformanceTest,com.github.mapkiwiz.test.MissingTestDataset</excludedGroups>
 				</configuration>
 			</plugin>
 			<plugin>
