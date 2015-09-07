@@ -9,6 +9,7 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -46,7 +47,9 @@ public class RoadGraphConfig {
 	}
 	
 	@Bean
-	public Graph<Node, DefaultWeightedEdge> roadGraph(DataSource dataSource) throws IOException {
+	public Graph<Node, DefaultWeightedEdge> roadGraph(
+			@Value("${data.node.file.url}") URL nodeFileURL,
+			@Value("${data.edge.file.url}") URL edgeFileURL) throws IOException {
 		
 //		LOGGER.info("Loading road graph from JDBC connection");
 //		
@@ -63,8 +66,6 @@ public class RoadGraphConfig {
 		
 		LOGGER.info("Loading road graph from local TSV files");
 		
-		URL nodeFileURL = getClass().getClassLoader().getResource("large.nodes.tsv.gz");
-		URL edgeFileURL = getClass().getClassLoader().getResource("large.edges.tsv.gz");
 		CSVEdgeListGraphLoader loader = new CSVEdgeListGraphLoader(nodeFileURL, edgeFileURL);
 		
 		Graph<Node, DefaultWeightedEdge> graph = loader.loadGraph();

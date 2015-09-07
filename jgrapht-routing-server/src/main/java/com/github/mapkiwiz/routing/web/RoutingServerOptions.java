@@ -14,7 +14,13 @@ public class RoutingServerOptions extends Options {
 		
 		Option optPort = new Option("p", "port", true, "server port");
 		optPort.setType(Integer.class);
+		optPort.setArgName("port");
 		addOption(optPort);
+		
+		Option optConfig = new Option("c", "config", true, "configuration property file");
+		optConfig.setArgName("propertyfile");
+		optConfig.setType(String.class);
+		addOption(optConfig);
 		
 	}
 

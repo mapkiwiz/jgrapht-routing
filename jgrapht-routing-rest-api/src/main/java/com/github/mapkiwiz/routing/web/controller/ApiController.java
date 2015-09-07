@@ -58,7 +58,7 @@ public class ApiController extends ApiControllerBase implements DisposableBean {
 	private Graph<Node, DefaultWeightedEdge> graph;
 	
 	@Autowired
-	private NodeLocator nodeLocator;
+	private NodeLocator<?> nodeLocator;
 	
 	@Autowired
 	private StatsDClient stats;
@@ -287,10 +287,10 @@ public class ApiController extends ApiControllerBase implements DisposableBean {
 				List<Node> nodes = processor.isochrone(graph, node, distance);
 				
 				if (concaveHull) {
-					ConcaveHullBuilder builder = new ConcaveHullBuilder();
+					ConcaveHullBuilder<Node> builder = new ConcaveHullBuilder<Node>();
 					hull = builder.buildHull(nodes);
 				} else {
-					ConvexHullBuilder builder = new ConvexHullBuilder();
+					ConvexHullBuilder<Node> builder = new ConvexHullBuilder<Node>();
 					hull = builder.buildHull(nodes);
 				}
 				

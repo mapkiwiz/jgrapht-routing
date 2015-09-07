@@ -3,9 +3,9 @@ package com.github.mapkiwiz.routing.web.config;
 import java.util.Arrays;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.concurrent.ThreadPoolExecutorFactoryBean;
 import org.springframework.web.accept.ContentNegotiationManagerFactoryBean;
@@ -31,13 +31,8 @@ import com.timgroup.statsd.StatsDClient;
 public class WebMvcConfig extends WebMvcConfigurerAdapter {
 	
 	@Bean
-	public StatsDClient statsdClient() {
-		return new NonBlockingStatsDClient("routing", "localhost", 8125);
-	}
-
-	@Bean
-	public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-		return new PropertySourcesPlaceholderConfigurer();
+	public StatsDClient statsdClient(@Value("${statsd.prefix}") String prefix, @Value("${statsd.host}") String host, @Value("${statsd.port}") int port) {
+		return new NonBlockingStatsDClient(prefix, host, port);
 	}
 	
 	@Bean
@@ -67,9 +62,9 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
 	}
 	
 	@Bean
-	public ApiController apiController(ThreadPoolExecutor executor) {
-		executor.setCorePoolSize(4);
-		executor.setMaximumPoolSize(4);
+	public ApiController apiController(ThreadPoolExecutor executor, @Value("${worker.threads}") int nThreads) {
+		executor.setCorePoolSize(nThreads);
+		executor.setMaximumPoolSize(nThreads);
 		ApiController controller = new ApiController(executor);
 		return controller;
 	}

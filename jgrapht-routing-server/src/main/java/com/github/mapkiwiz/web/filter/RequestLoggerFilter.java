@@ -22,9 +22,12 @@ public class RequestLoggerFilter extends OncePerRequestFilter {
 			HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		
+		long startTime = System.currentTimeMillis();
 		filterChain.doFilter(request, response);
+		long duration = System.currentTimeMillis() - startTime;
+		
 		String method = request.getRequestURI().replaceFirst("/", "");
-		LOGGER.info("[{}] {}", response.getStatus(), method);
+		LOGGER.info("[{}] {} t={} ms.", response.getStatus(), method, duration);
 		
 	}
 

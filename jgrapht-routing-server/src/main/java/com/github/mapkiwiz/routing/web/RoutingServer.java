@@ -1,6 +1,9 @@
 package com.github.mapkiwiz.routing.web;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.EnumSet;
+import java.util.Properties;
 
 import javax.servlet.DispatcherType;
 
@@ -15,9 +18,12 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
+import com.github.mapkiwiz.routing.web.config.WebMvcConfig;
 import com.github.mapkiwiz.routing.web.controller.ApiControllerBase.AppInfo;
 import com.github.mapkiwiz.web.filter.RequestLoggerFilter;
 
@@ -26,10 +32,15 @@ public class RoutingServer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RoutingServer.class);
 	private Server server;
 	private int port = 8080;
+	private String config;
+	private Properties properties;
 	
-	public RoutingServer() {
+	public RoutingServer(CommandLine options) throws IOException {
+		
 		AppInfo appInfo = new AppInfo();
 		LOGGER.info("{} Version {} API v{}", getClass().getSimpleName(), "0.5-SNAPSHOT", appInfo.version);
+		setProperties(options);
+		
 	}
 	
 	public void start() throws Exception {
@@ -45,9 +56,15 @@ public class RoutingServer {
 				ServletContextHandler.NO_SECURITY |
 				ServletContextHandler.NO_SESSIONS);
 		servletContextHandler.setContextPath("/routing");
+		
 		AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
-		context.scan("com.github.mapkiwiz.routing.web.config");
+		context.scan(ClassUtils.getPackageName(WebMvcConfig.class));
 		context.registerShutdownHook();
+		
+		PropertySourcesPlaceholderConfigurer placeholderConfigurer = new PropertySourcesPlaceholderConfigurer();
+		placeholderConfigurer.setProperties(properties);
+		context.addBeanFactoryPostProcessor(placeholderConfigurer);
+		
 		DispatcherServlet servlet = new DispatcherServlet(context);
 		servletContextHandler.addServlet(new ServletHolder(servlet), "/*");
 		
@@ -83,6 +100,24 @@ public class RoutingServer {
 //		contextHandler.addFilter(new FilterHolder(filter), "/*", EnumSet.of(DispatcherType.REQUEST));
 //	}
 	
+	private void setProperties(CommandLine options) throws IOException {
+		
+		config = options.getOptionValue("c", null);
+		
+		properties = new Properties();
+		LOGGER.info("Loading default configuration properties");
+		properties.load(getClass().getClassLoader().getResourceAsStream("routing.default.properties"));
+		
+		if (config != null) {
+			LOGGER.info("Reading configuration from file {}", config);
+			properties = new Properties(properties);
+			properties.load(new FileInputStream(config));
+		}
+		
+		port = Integer.valueOf(options.getOptionValue("p", properties.getProperty("http.port")));
+		
+	}
+	
 	public static void main(String[] args) {
 		
 		try {
@@ -91,8 +126,7 @@ public class RoutingServer {
 			CommandLine options = commandLineParser.parse(
 					new RoutingServerOptions(), args);
 			
-			final RoutingServer server = new RoutingServer();
-			server.port = Integer.valueOf(options.getOptionValue("p", "8080"));
+			final RoutingServer server = new RoutingServer(options);
 			server.start();
 			LOGGER.info("Server started on port {}", server.port);
 			
