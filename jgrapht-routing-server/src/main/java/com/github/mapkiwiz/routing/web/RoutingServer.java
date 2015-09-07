@@ -13,7 +13,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.ParseException;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.slf4j.Logger;
@@ -32,7 +32,6 @@ public class RoutingServer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RoutingServer.class);
 	private Server server;
 	private int port = 8080;
-	private String config;
 	private Properties properties;
 	
 	public RoutingServer(CommandLine options) throws IOException {
@@ -44,13 +43,6 @@ public class RoutingServer {
 	}
 	
 	public void start() throws Exception {
-		
-		ResourceHandler resourceHandler = new ResourceHandler();
-		resourceHandler.setDirectoriesListed(false);
-		resourceHandler.setResourceBase("./src/main/webapp");
-		resourceHandler.setWelcomeFiles(new String[] {
-			"index.html"
-		});
 		
 		ServletContextHandler servletContextHandler = new ServletContextHandler(
 				ServletContextHandler.NO_SECURITY |
@@ -66,13 +58,13 @@ public class RoutingServer {
 		context.addBeanFactoryPostProcessor(placeholderConfigurer);
 		
 		DispatcherServlet servlet = new DispatcherServlet(context);
-		servletContextHandler.addServlet(new ServletHolder(servlet), "/*");
+		servletContextHandler.addServlet(new ServletHolder("dispatcherServlet", servlet), "/*");
 		
-		//registerProxyFilter(servletContextHandler, "requestLoggerFilter");
-		servletContextHandler.addFilter(RequestLoggerFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
+		RequestLoggerFilter filter = new RequestLoggerFilter();
+		filter.setLogger(LOGGER);
+		servletContextHandler.addFilter(new FilterHolder(filter), "/*", EnumSet.of(DispatcherType.REQUEST));
 		
 		HandlerList handlers = new HandlerList();
-		handlers.addHandler(resourceHandler);
 		handlers.addHandler(servletContextHandler);
 		
 		server = new Server(port);
@@ -94,21 +86,15 @@ public class RoutingServer {
 		
 	}
 	
-//	private void registerProxyFilter(ServletContextHandler contextHandler, String name) {
-//		DelegatingFilterProxy filter = new DelegatingFilterProxy(name);
-//		filter.setContextAttribute("org.springframework.web.servlet.FrameworkServlet.CONTEXT.dispatcher");
-//		contextHandler.addFilter(new FilterHolder(filter), "/*", EnumSet.of(DispatcherType.REQUEST));
-//	}
-	
-	private void setProperties(CommandLine options) throws IOException {
-		
-		config = options.getOptionValue("c", null);
+	protected void setProperties(CommandLine options) throws IOException {
 		
 		properties = new Properties();
 		LOGGER.info("Loading default configuration properties");
-		properties.load(getClass().getClassLoader().getResourceAsStream("routing.default.properties"));
+		properties.load(ClassUtils.getDefaultClassLoader().getResourceAsStream("routing.default.properties"));
 		
-		if (config != null) {
+		String config;
+		
+		if ((config = options.getOptionValue("c", null)) != null) {
 			LOGGER.info("Reading configuration from file {}", config);
 			properties = new Properties(properties);
 			properties.load(new FileInputStream(config));
@@ -143,7 +129,7 @@ public class RoutingServer {
 			
 			LOGGER.error(e.getMessage());
 			HelpFormatter helpFormatter = new HelpFormatter();
-			helpFormatter.printHelp("server", new RoutingServerOptions());
+			helpFormatter.printHelp(RoutingServer.class.getSimpleName(), new RoutingServerOptions());
 			
 			LOGGER.debug(e.getMessage(), e);
 			

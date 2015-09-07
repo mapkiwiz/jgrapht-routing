@@ -7,6 +7,9 @@ import java.util.PriorityQueue;
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 
+import com.github.mapkiwiz.geo.Node;
+import com.github.mapkiwiz.geo.NodeUtils;
+
 public class PriorityQueueDijkstraIterator<V,E> implements DijkstraIterator<V> {
 
 	private final PriorityQueue<QueueEntry<V>> heap;
@@ -157,7 +160,11 @@ public class PriorityQueueDijkstraIterator<V,E> implements DijkstraIterator<V> {
 		if (entry == null) {
 			return null;
 		} else {
-			return new PathElement<V>(entry.parent, entry.path_element_weight, entry.path_element_weight);
+			double distance = 0.0;
+			if (entry.parent instanceof Node) {
+				distance = NodeUtils.sphericalDistance((Node) entry.parent, (Node) vertex);
+			}
+			return new PathElement<V>(entry.parent, distance, entry.path_element_weight);
 		}
 		
 	}

@@ -1,5 +1,8 @@
 package com.github.mapkiwiz.routing.web.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -7,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.github.mapkiwiz.geo.Node;
+import com.github.mapkiwiz.geojson.Feature;
 import com.github.mapkiwiz.geojson.Point;
 
 
@@ -61,6 +65,15 @@ public abstract class ApiControllerBase {
 		
 	}
 	
+	public Feature<Point> asFeature(Node node) {
+		
+		Feature<Point> feature = new Feature<Point>();
+		feature.geometry = asPoint(node);
+		feature.properties.put("id", node.id);
+		return feature;
+		
+	}
+	
 	public static class AppInfo {
 		
 		public final String version = "1.0";
@@ -83,7 +96,25 @@ public abstract class ApiControllerBase {
 		public double distance;
 		public double time;
 		public String distance_unit = "meters";
-		public String time_unit = "minutes";
+		public String time_unit = "meters";
+		public String type = "Distance";
+		
+	}
+	
+	public static class DistanceMatrixInfo {
+		
+		public Feature<Point> source;
+		public String distance_unit = "meters";
+		// public String time_unit = "minutes";
+		public List<DistanceMatrixResult> distances = new ArrayList<DistanceMatrixResult>();
+		public String type = "DistanceMatrix";
+		
+	}
+	
+	public static class DistanceMatrixResult {
+		
+		public Feature<Point> target;
+		public double distance;
 		
 	}
 	

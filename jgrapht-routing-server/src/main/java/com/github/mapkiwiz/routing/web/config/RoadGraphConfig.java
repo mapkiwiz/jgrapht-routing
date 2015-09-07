@@ -6,7 +6,6 @@ import java.net.URL;
 import javax.sql.DataSource;
 
 import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultWeightedEdge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,9 +16,11 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import com.github.mapkiwiz.geo.Node;
 import com.github.mapkiwiz.graph.DijsktraIteratorFactory;
 import com.github.mapkiwiz.graph.PriorityQueueDijkstraIterator;
+import com.github.mapkiwiz.graph.contraction.CSVPreparedGraphLoader;
 import com.github.mapkiwiz.graph.loader.CSVEdgeListGraphLoader;
 import com.github.mapkiwiz.locator.IndexNodeLocator;
 import com.github.mapkiwiz.locator.NodeLocator;
+import com.github.mapkiwiz.routing.web.controller.GraphHolder;
 
 
 @Configuration
@@ -47,9 +48,10 @@ public class RoadGraphConfig {
 	}
 	
 	@Bean
-	public Graph<Node, DefaultWeightedEdge> roadGraph(
+	public GraphHolder roadGraph(
 			@Value("${data.node.file.url}") URL nodeFileURL,
-			@Value("${data.edge.file.url}") URL edgeFileURL) throws IOException {
+			@Value("${data.edge.file.url}") URL edgeFileURL,
+			@Value("${data.prepared}") boolean prepared) throws IOException {
 		
 //		LOGGER.info("Loading road graph from JDBC connection");
 //		
@@ -64,25 +66,34 @@ public class RoadGraphConfig {
 //				nodeTemplateQuery,
 //				edgeTemplateQuery);
 		
-		LOGGER.info("Loading road graph from local TSV files");
+		Graph<? extends Node, ?> graph;
+		long startTime = System.currentTimeMillis();
 		
-		CSVEdgeListGraphLoader loader = new CSVEdgeListGraphLoader(nodeFileURL, edgeFileURL);
+		if (prepared) {
+			LOGGER.info("Loading prepared graph from TSV files");
+			CSVPreparedGraphLoader loader = new CSVPreparedGraphLoader(nodeFileURL, edgeFileURL);
+			graph = loader.loadGraph();
+		} else {
+			LOGGER.info("Loading road graph from TSV files");
+			CSVEdgeListGraphLoader loader = new CSVEdgeListGraphLoader(nodeFileURL, edgeFileURL);
+			graph = loader.loadGraph();
+		}
 		
-		Graph<Node, DefaultWeightedEdge> graph = loader.loadGraph();
+		double loadingTimeSeconds = (System.currentTimeMillis() - startTime) / 1000.0;
 		
-		LOGGER.info("Loading time : {} s.", loader.getLoadingTimeSeconds());
+		LOGGER.info("Loading time : {} s.", loadingTimeSeconds);
 		LOGGER.info("Loaded {} nodes", graph.vertexSet().size());
 		LOGGER.info("Loaded {} edges", graph.edgeSet().size());
 		
-		return graph;
+		return new GraphHolder(graph);
 		
 	}
 	
 	@Bean
-	public NodeLocator<Node> nodeLocator(Graph<Node, DefaultWeightedEdge> graph) {
+	public NodeLocator<?> nodeLocator(GraphHolder holder) {
 		
 		LOGGER.info("Building node index ...");
-		NodeLocator<Node> locator = new IndexNodeLocator<Node>(graph.vertexSet());
+		NodeLocator<Node> locator = new IndexNodeLocator<Node>(holder.getGraph(Node.class).vertexSet());
 		LOGGER.info("Index built.");
 		
 		return locator;

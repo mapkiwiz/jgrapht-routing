@@ -7,12 +7,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultWeightedEdge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,6 +27,7 @@ import com.github.mapkiwiz.geojson.LineString;
 import com.github.mapkiwiz.geojson.Point;
 import com.github.mapkiwiz.geojson.Polygon;
 import com.github.mapkiwiz.graph.DijsktraIteratorFactory;
+import com.github.mapkiwiz.graph.DistanceMatrix;
 import com.github.mapkiwiz.graph.Isochrone;
 import com.github.mapkiwiz.graph.Path;
 import com.github.mapkiwiz.graph.PathElement;
@@ -47,15 +47,20 @@ public class ApiController extends ApiControllerBase implements DisposableBean {
 	
 	private final static Logger LOGGER = LoggerFactory.getLogger(ApiController.class);
 	
-	public double isochroneMinDistance = 10000.0; // 10 km
-	public double isochroneMaxDistance = 60000.0; // 60 km
-	public double searchDistance = 0.05;
+	@Value("${search.isochrone.min.distance}")
+	private double isochroneMinDistance;
+	
+	@Value("${search.isochrone.max.distance}")
+	private double isochroneMaxDistance;
+	
+	@Value("${search.max.distance}")
+	private double searchDistance;
 	
 	@Autowired
 	private DijsktraIteratorFactory iteratorFactory;
 	
 	@Autowired
-	private Graph<Node, DefaultWeightedEdge> graph;
+	private GraphHolder graphHolder;
 	
 	@Autowired
 	private NodeLocator<?> nodeLocator;
@@ -121,7 +126,7 @@ public class ApiController extends ApiControllerBase implements DisposableBean {
 				
 				long spStartTime = System.currentTimeMillis();
 				ShortestPath shortestPath = new ShortestPath(iteratorFactory);
-				Path<Node> path = shortestPath.shortestPath(graph, sourceNode, targetNode);
+				Path<Node> path = shortestPath.shortestPath(graphHolder.getGraph(Node.class), sourceNode, targetNode);
 				stats.recordExecutionTimeToNow("shortest_path.execution", spStartTime);
 				return path;
 				
@@ -201,7 +206,7 @@ public class ApiController extends ApiControllerBase implements DisposableBean {
 						
 						long startTime = System.currentTimeMillis();
 						ShortestPath shortestPath = new ShortestPath(iteratorFactory);
-						Path<Node> path = shortestPath.shortestPath(graph, sourceNode, targetNode);
+						Path<Node> path = shortestPath.shortestPath(graphHolder.getGraph(Node.class), sourceNode, targetNode);
 						stats.recordExecutionTimeToNow("shortest_path.execution", startTime);
 						
 						if (LOGGER.isDebugEnabled()) {
@@ -284,7 +289,7 @@ public class ApiController extends ApiControllerBase implements DisposableBean {
 				
 				List<Node> hull;
 				Isochrone processor = new Isochrone(iteratorFactory);
-				List<Node> nodes = processor.isochrone(graph, node, distance);
+				List<Node> nodes = processor.isochrone(graphHolder.getGraph(Node.class), node, distance);
 				
 				if (concaveHull) {
 					ConcaveHullBuilder<Node> builder = new ConcaveHullBuilder<Node>();
@@ -313,6 +318,77 @@ public class ApiController extends ApiControllerBase implements DisposableBean {
 		stats.increment("isochrone.request.count");
 		
 		return polygon;
+		
+	}
+	
+	@RequestMapping("/matrix")
+	public DistanceMatrixInfo distanceMatrix(
+			@RequestParam("source") final List<Double> source,
+			@RequestParam("target") final List<List<Double>> targets) throws InvalidParameterFormat, NearestNodeNotFound {
+		
+		
+		Future<DistanceMatrixInfo> promise =
+				this.worker.submit(new Callable<DistanceMatrixInfo>() {
+
+					public DistanceMatrixInfo call() throws Exception {
+						
+						Node sourceNode = getNodeFromLocParameter(source);
+						
+						Node[] nodes;
+						
+						if (targets.size() == 2 && targets.get(0).size() == 1 && targets.get(1).size() == 1) {
+							
+							double lon = targets.get(0).get(0);
+							double lat = targets.get(1).get(0);
+							nodes = new Node[1];
+							nodes[0] = nodeLocator.locate(lon, lat, searchDistance);
+							
+						} else {
+						
+							nodes = new Node[targets.size()];
+							for (int i=0; i<nodes.length; i++) {
+								nodes[i] = getNodeFromLocParameter(targets.get(i));
+							}
+						
+						}
+						
+						DistanceMatrix<Node> matrix = new DistanceMatrix<Node>();
+						double[] distances =
+								matrix.distances(graphHolder.getGraph(Node.class), sourceNode, nodes);
+						
+						DistanceMatrixInfo matrixInfo = new DistanceMatrixInfo();
+						matrixInfo.source = asFeature(sourceNode);
+						
+						for (int i=0; i<nodes.length; i++) {
+							DistanceMatrixResult result = new DistanceMatrixResult();
+							result.target = asFeature(nodes[i]);
+							result.distance = distances[i];
+							matrixInfo.distances.add(result);
+						}
+						
+						return matrixInfo;
+						
+					}
+				
+				});
+		
+		try {
+			
+			return promise.get();
+			
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		} catch (ExecutionException e) {
+			
+			if (e.getCause() instanceof InvalidParameterFormat) {
+				throw (InvalidParameterFormat) e.getCause();
+			} else if (e.getCause() instanceof NearestNodeNotFound) {
+				throw (NearestNodeNotFound) e.getCause();
+			}
+			
+			throw new RuntimeException(e);
+			
+		}
 		
 	}
 	

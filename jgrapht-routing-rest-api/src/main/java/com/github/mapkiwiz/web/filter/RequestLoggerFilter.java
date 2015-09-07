@@ -11,11 +11,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.github.mapkiwiz.routing.web.RoutingServer;
-
 public class RequestLoggerFilter extends OncePerRequestFilter {
 	
-	private final static Logger LOGGER = LoggerFactory.getLogger(RoutingServer.class);
+	private Logger logger;
+	
+	public Logger getLogger() {
+		if (logger == null) {
+			logger = LoggerFactory.getLogger(getClass());
+		}
+		return logger;
+	}
+	
+	public void setLogger(Logger logger) {
+		this.logger = logger;
+	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request,
@@ -27,7 +36,7 @@ public class RequestLoggerFilter extends OncePerRequestFilter {
 		long duration = System.currentTimeMillis() - startTime;
 		
 		String method = request.getRequestURI().replaceFirst("/", "");
-		LOGGER.info("[{}] {} t={} ms.", response.getStatus(), method, duration);
+		getLogger().info("[{}] {} t={} ms.", response.getStatus(), method, duration);
 		
 	}
 

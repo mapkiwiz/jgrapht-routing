@@ -78,12 +78,7 @@
 		</dependency>
 
 		<!-- Import test data -->
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>jgrapht-routing-core</artifactId>
-			<version>${project.version}</version>
-			<classifier>tests</classifier>
-		</dependency>
+		<!---->
 
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -116,11 +111,6 @@
 			<version>${spring.version}</version>
 		</dependency>
 
-		<!-- <dependency> <groupId>org.springframework.security</groupId> <artifactId>spring-security-taglibs</artifactId> 
-			<version>${spring.security.version}</version> </dependency> <dependency> 
-			<groupId>org.springframework.security.oauth</groupId> <artifactId>spring-security-oauth2</artifactId> 
-			<version>${spring.security.oauth.version}</version> </dependency> -->
-
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
@@ -139,16 +129,6 @@
 			<artifactId>jstl</artifactId>
 			<version>1.2</version>
 		</dependency>
-
-		<!-- <dependency> <groupId>org.webjars.bower</groupId> <artifactId>jquery</artifactId> 
-			<version>1.11.0</version> </dependency> <dependency> <groupId>org.webjars.bower</groupId> 
-			<artifactId>bootstrap</artifactId> <version>3.1.1</version> </dependency> 
-			<dependency> <groupId>org.webjars.bower</groupId> <artifactId>angular</artifactId> 
-			<version>${angular.version}</version> </dependency> <dependency> <groupId>org.webjars.bower</groupId> 
-			<artifactId>angular-sanitize</artifactId> <version>${angular.version}</version> 
-			</dependency> <dependency> <groupId>org.webjars.bower</groupId> <artifactId>angular-bootstrap</artifactId> 
-			<version>0.13.0</version> </dependency> <dependency> <groupId>org.webjars.bower</groupId> 
-			<artifactId>jwt-client</artifactId> <version>0.1.0</version> </dependency> -->
 
 		<dependency>
 			<groupId>org.postgresql</groupId>
@@ -181,12 +161,12 @@
 		</dependency>
 
 		<!-- for integration tests of service -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-webapp</artifactId>
 			<version>${jetty.version}</version>
 			<scope>test</scope>
-		</dependency>
+		</dependency>  -->
 
 		<dependency>
 			<groupId>commons-cli</groupId>
@@ -195,6 +175,22 @@
 		</dependency>
 
 	</dependencies>
+	
+	<profiles>
+	
+		<profile>
+			<id>test-data</id>
+			<dependencies>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>jgrapht-routing-core</artifactId>
+					<version>${project.version}</version>
+					<classifier>tests</classifier>
+				</dependency>
+			</dependencies>
+		</profile>
+		
+	</profiles>
 
 </project>
 

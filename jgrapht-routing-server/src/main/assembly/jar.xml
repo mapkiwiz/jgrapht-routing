@@ -15,7 +15,7 @@
 	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/${mdoVersion}"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/${mdoVersion} http://maven.apache.org/xsd/assembly-${mdoVersion}.xsd">
-	<id>with-dep</id>
+	<id>standalone</id>
 	<formats>
 		<format>jar</format>
 	</formats>

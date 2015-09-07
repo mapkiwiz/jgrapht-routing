@@ -69,34 +69,9 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
 		return controller;
 	}
 	
-//	@Bean
-//	public StatelessRestController serviceController() {
-//		return new StatelessRestController();
-//	}
-//	
-//	@Bean
-//	public StatefulWebController accessTokenController() {
-//		return new StatefulWebController();
-//	}
-//	
-//	@Bean
-//	public AdminController adminController() {
-//		return new AdminController();
-//	}
-//	
-//	@Bean
-//	public ApplicationController applicationController() {
-//		return new ApplicationController();
-//	}
-	
-//	@Bean
-//	public BeanNameViewResolver beanNameViewResolver() {
-//		return new BeanNameViewResolver();
-//	}
-	
 	@Override
 	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
-//		configurer.enable();
+		configurer.enable("dispatcherServlet");
 	}
 	
 }

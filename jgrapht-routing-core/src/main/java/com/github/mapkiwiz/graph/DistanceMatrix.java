@@ -11,7 +11,7 @@ public class DistanceMatrix<V> {
 		this.factory = new PriorityQueueDijkstraIterator.Factory();
 	}
 	
-	public <E> double[] distances(Graph<V, E> graph, V source, V... targets) {
+	public double[] distances(Graph<V, ?> graph, V source, V... targets) {
 		
 		double[] vector = new double[targets.length];
 		DijkstraIterator<V> iterator = factory.create(graph, source);
@@ -29,7 +29,7 @@ public class DistanceMatrix<V> {
 		
 	}
 	
-	public <E> double[][] distances(Graph<V, E> graph, V... nodes) {
+	public double[][] distances(Graph<V, ?> graph, V... nodes) {
 		
 		double[][] matrix = new double[nodes.length][nodes.length];
 		

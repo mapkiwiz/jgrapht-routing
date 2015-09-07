@@ -7,6 +7,11 @@ import com.github.mapkiwiz.geojson.Polygon;
 
 
 public class NodeUtils {
+	
+	/**
+     * mean radius of the earth
+     */
+    public final static double R = 6371000; // m
 
 	public static <V extends Node> double length(List<V> ring) {
 
@@ -44,5 +49,17 @@ public class NodeUtils {
 		return polygon;
 		
 	}
+    
+    public static <V extends Node> double sphericalDistance(V a, V b) {
+    	
+    	double sinDeltaLat = Math.sin(Math.toRadians(b.lat - a.lat) / 2);
+        double sinDeltaLon = Math.sin(Math.toRadians(b.lon - a.lon) / 2);
+        double normedDist =
+        		sinDeltaLat * sinDeltaLat
+                + sinDeltaLon * sinDeltaLon * Math.cos(Math.toRadians(a.lat)) * Math.cos(Math.toRadians(b.lat));
+        
+        return R * 2 * Math.asin(Math.sqrt(normedDist));
+        
+    }
 
 }
