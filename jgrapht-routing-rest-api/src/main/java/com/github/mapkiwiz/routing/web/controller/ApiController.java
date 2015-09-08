@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import org.jgrapht.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -32,7 +33,10 @@ import com.github.mapkiwiz.graph.Isochrone;
 import com.github.mapkiwiz.graph.Path;
 import com.github.mapkiwiz.graph.PathElement;
 import com.github.mapkiwiz.graph.ShortestPath;
+import com.github.mapkiwiz.graph.contraction.PreparedGraph;
 import com.github.mapkiwiz.locator.NodeLocator;
+import com.github.mapkiwiz.routing.web.controller.method.DistanceQuery;
+import com.github.mapkiwiz.routing.web.controller.method.PreparedDistanceQuery;
 import com.timgroup.statsd.StatsDClient;
 
 
@@ -114,53 +118,35 @@ public class ApiController extends ApiControllerBase implements DisposableBean {
 				
 		final long startTime = System.currentTimeMillis();
 		
-		final Node sourceNode = getNodeFromLocParameter(source);
-		final Node targetNode = getNodeFromLocParameter(target);
+		Node sourceNode = getNodeFromLocParameter(source);
+		Node targetNode = getNodeFromLocParameter(target);
 		
 		stats.recordExecutionTime("locate.execution", (System.currentTimeMillis() - startTime) / 2);
 		
-		Future<Path<Node>> promise =
-				this.worker.submit(new Callable<Path<Node>>() {
-
-			public Path<Node> call() throws Exception {
-				
-				long spStartTime = System.currentTimeMillis();
-				ShortestPath shortestPath = new ShortestPath(iteratorFactory);
-				Path<Node> path = shortestPath.shortestPath(graphHolder.getGraph(Node.class), sourceNode, targetNode);
-				stats.recordExecutionTimeToNow("shortest_path.execution", spStartTime);
-				return path;
-				
-			}
-			
-		});
+		Future<DistanceInfo> promise;
 		
-		Path<Node> path;
+		if (graphHolder.isPrepared()) {
+			promise = this.worker.submit(
+					new PreparedDistanceQuery(this, sourceNode, targetNode));
+		} else {
+			promise = this.worker.submit(
+					new DistanceQuery(this, sourceNode, targetNode));
+		}
+		
 		try {
-			path = promise.get();
+			
+			DistanceInfo info = promise.get();
+			stats.recordExecutionTimeToNow("distance.request.execution.total", startTime);
+			stats.increment("distance.request.count");
+			
+			return info;
+			
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		} catch (ExecutionException e) {
 			throw new RuntimeException(e);
 		}
 		
-		double distance = 0.0;
-		double time = 0.0;
-		
-		for (PathElement<Node> segment : path.elements) {
-			distance += segment.distance;
-			time += segment.weight;
-		}
-		
-		DistanceInfo info = new DistanceInfo();
-		info.distance = distance;
-		info.time = time;
-		info.source = asPoint(sourceNode);
-		info.target = asPoint(targetNode);
-		
-		stats.recordExecutionTimeToNow("distance.request.execution.total", startTime);
-		stats.increment("distance.request.count");
-		
-		return info;
 		
 	}
 	
@@ -390,6 +376,28 @@ public class ApiController extends ApiControllerBase implements DisposableBean {
 			
 		}
 		
+	}
+	
+	public Graph<Node, ?> getGraph() {
+		return graphHolder.getGraph(Node.class);
+	}
+	
+	public PreparedGraph getPreparedGraph() {
+		
+		if (graphHolder.isPrepared()) {
+			return (PreparedGraph) graphHolder.getGraph();
+		} else {
+			return null;
+		}
+		
+	}
+	
+	public StatsDClient getStats() {
+		return stats;
+	}
+	
+	public DijsktraIteratorFactory getIteratorFactory() {
+		return iteratorFactory;
 	}
 	
 	Logger getLogger() {

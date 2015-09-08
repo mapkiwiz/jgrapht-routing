@@ -76,9 +76,11 @@ public abstract class ApiControllerBase {
 	
 	public static class AppInfo {
 		
-		public final String version = "1.0";
+		public final String version = "5.0-SNAPSHOT";
+		public final String apiVersion = "1";
 		public final String app = "Routing Service";
 		public final String documentation = "/path/to/the/doc";
+		public final String type = "AppInfo";
 		
 	}
 	
@@ -86,6 +88,7 @@ public abstract class ApiControllerBase {
 		
 		public String error;
 		public String message;
+		public final String type = "ExceptionReport";
 		
 	}
 	
@@ -94,10 +97,10 @@ public abstract class ApiControllerBase {
 		public Point source;
 		public Point target;
 		public double distance;
-		public double time;
+		public double cost;
 		public String distance_unit = "meters";
-		public String time_unit = "meters";
-		public String type = "Distance";
+		public String cost_unit = "meters";
+		public final String type = "Distance";
 		
 	}
 	
@@ -107,7 +110,7 @@ public abstract class ApiControllerBase {
 		public String distance_unit = "meters";
 		// public String time_unit = "minutes";
 		public List<DistanceMatrixResult> distances = new ArrayList<DistanceMatrixResult>();
-		public String type = "DistanceMatrix";
+		public final String type = "DistanceMatrix";
 		
 	}
 	
@@ -115,6 +118,7 @@ public abstract class ApiControllerBase {
 		
 		public Feature<Point> target;
 		public double distance;
+		public final String type = "TargetDistance";
 		
 	}
 	
