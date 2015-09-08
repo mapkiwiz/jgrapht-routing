@@ -23,8 +23,9 @@ public class NodePriorityCalculator implements ShortcutFinderListener {
 		this.incidentEdgeCount = count;
 	}
 
-	public void considerShortcut(PreparedNode source, PreparedNode target,
-			double weight) {
+	public void considerShortcut(
+			PreparedNode source, PreparedNode target, double weight,
+			PreparedEdge inEdge, PreparedEdge outEdge, PreparedNode viaNode) {
 		this.shortcutCount++;
 	}
 

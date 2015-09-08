@@ -22,8 +22,10 @@ public class PreparedGraphQueryTest {
 	public PreparedGraph loadLargeGraph() throws IOException {
 
 		URL node_file = new URL("file:///tmp/rhone-alpes.prepared.nodes.tsv");
-		URL edge_file = new URL("file:///tmp/rhone-alpes.prepared.edges.tsv");;
-		CSVPreparedGraphLoader loader = new CSVPreparedGraphLoader(node_file, edge_file);
+		URL edge_file = new URL("file:///tmp/rhone-alpes.prepared.edges.tsv");
+		URL shortcut_file = new URL("file:///tmp/rhone-alpes.prepared.shortcuts.tsv");
+		CSVPreparedGraphLoader loader = new CSVPreparedGraphLoader(node_file, edge_file, shortcut_file);
+		loader.setCoordinatePrecision(6);
 		return loader.loadGraph();
 
 	}
@@ -51,7 +53,7 @@ public class PreparedGraphQueryTest {
 		System.out.println("Duration : " + duration + " ms.");
 		
 		double avgDuration = 0.0;
-		for (int i=0; i<100; i++) {
+		for (int i=0; i<500; i++) {
 			startTime = System.currentTimeMillis();
 			distance = graph.shortestPathLength(source, target);
 			duration = System.currentTimeMillis() - startTime;

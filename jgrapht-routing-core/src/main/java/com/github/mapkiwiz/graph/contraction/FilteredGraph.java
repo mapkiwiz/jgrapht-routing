@@ -35,8 +35,8 @@ import org.jgrapht.graph.GraphDelegator;
 	
 	protected boolean isFilteredOut(PreparedEdge edge) {
 		
-		return (edge.level < minLevel) ||
-			   (noShortcuts && edge.shortcut) ||
+		return (edge.data.level < minLevel) ||
+			   (noShortcuts && edge.data.shortcut) ||
 			   edge.source.equals(removedNode) ||
 			   edge.target.equals(removedNode);
 		

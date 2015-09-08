@@ -19,7 +19,7 @@ public class DefaultPrioritizeTask implements PrioritizeTask {
 			int minLevel) {
 
 		final int totalNodeCount = graph.vertexSet().size();
-		TextProgressTracker progressTracker = new TextProgressTracker(totalNodeCount);
+		TextProgressTracker progressTracker = new TextProgressTracker("Computing node priority", totalNodeCount);
 		
 		List<QueueEntry> entries = new ArrayList<QueueEntry>(totalNodeCount);
 		
@@ -33,8 +33,11 @@ public class DefaultPrioritizeTask implements PrioritizeTask {
 			}
 		}
 		
-		return new PriorityQueue<GraphContractor.QueueEntry>(entries);
-
+		progressTracker.done();
+		progressTracker.logMessage("Sorting nodes by priority");
+		PriorityQueue<GraphContractor.QueueEntry> queue = new PriorityQueue<GraphContractor.QueueEntry>(entries);
+		
+		return queue;
 	}
 	
 }

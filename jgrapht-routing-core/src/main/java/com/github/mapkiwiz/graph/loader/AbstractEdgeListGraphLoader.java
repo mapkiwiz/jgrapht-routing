@@ -12,26 +12,27 @@ import org.jgrapht.Graph;
 public abstract class AbstractEdgeListGraphLoader<V, E, VID> {
 	
 	long loadingTime = 0;
-	Map<VID, V> nodeMap = Collections.emptyMap();
+	protected Map<VID, V> nodeMap = Collections.emptyMap();
 	
-	static class EdgeData {
+	protected static class EdgeData {
 		
-		Long source;
-		Long target;
-		double weight;
-		Object data;
+		public int id;
+		public Long source;
+		public Long target;
+		public double weight;
+		public Object data;
 		
 	}
 	
-	public abstract Iterator<V> getNodeIterator() throws IOException;
+	protected abstract Iterator<V> getNodeIterator() throws IOException;
 	
-	public abstract Iterator<EdgeData> getEdgeIterator() throws IOException;
+	protected abstract Iterator<EdgeData> getEdgeIterator() throws IOException;
 	
-	public abstract Graph<V, E> createNewGraph();
+	protected abstract Graph<V, E> createNewGraph();
 	
-	public abstract VID getNodeId(V node);
+	protected abstract VID getNodeId(V node);
 	
-	public abstract void addEdge(Graph<V, E> graph, V source, V target, double weight);
+	public abstract void addEdge(Graph<V, E> graph, V source, V target, EdgeData data);
 	
 	public Graph<V, E> loadGraph()
 			throws IOException {
@@ -54,9 +55,7 @@ public abstract class AbstractEdgeListGraphLoader<V, E, VID> {
 			EdgeData edgeData = edgeIterator.next();
 			V sourceNode = this.nodeMap.get(edgeData.source);
 			V targetNode = this.nodeMap.get(edgeData.target);
-			addEdge(graph, sourceNode, targetNode, edgeData.weight);
-//			DefaultWeightedEdge edge = graph.addEdge(sourceNode, targetNode);
-//			graph.setEdgeWeight(edge, edgeData.weight);
+			addEdge(graph, sourceNode, targetNode, edgeData);
 			
 		}
 		

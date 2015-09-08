@@ -34,6 +34,22 @@
 	    		</plugins>
 	    	</build>
 	    </profile>
+	    <profile>
+	    	<id>contract</id>
+	    	<build>
+	    		<plugins>
+	    			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.4.0</version>
+				<configuration>
+					<mainClass>com.github.mapkiwiz.graph.contraction.GraphContractor</mainClass>
+					<classpathScope>test</classpathScope>
+				</configuration>
+			</plugin>
+	    		</plugins>
+	    	</build>
+	    </profile>
 	</profiles>
 
 	<build>

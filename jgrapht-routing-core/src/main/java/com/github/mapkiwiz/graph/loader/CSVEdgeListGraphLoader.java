@@ -34,27 +34,27 @@ public class CSVEdgeListGraphLoader extends CSVEdgeListGraphLoaderBase<Node, Def
 	}
 
 	@Override
-	public Graph<Node, DefaultWeightedEdge> createNewGraph() {
+	protected Graph<Node, DefaultWeightedEdge> createNewGraph() {
 		return new SimpleWeightedGraph<Node, DefaultWeightedEdge>(DefaultWeightedEdge.class);
 	}
 
 	@Override
-	public Long getNodeId(Node node) {
+	protected Long getNodeId(Node node) {
 		return node.id;
 	}
 
 	@Override
-	public void addEdge(Graph<Node, DefaultWeightedEdge> graph, Node source, Node target, double weight) {
+	public void addEdge(Graph<Node, DefaultWeightedEdge> graph, Node source, Node target, EdgeData data) {
 		
 		DefaultWeightedEdge edge = graph.addEdge(source, target);
-		((SimpleWeightedGraph<Node, DefaultWeightedEdge>) graph).setEdgeWeight(edge, weight);
+		((SimpleWeightedGraph<Node, DefaultWeightedEdge>) graph).setEdgeWeight(edge, data.weight);
 		
 	}
 
 	protected Node asNode(CSVRecord record) {
 		int id = Integer.parseInt(record.get("ID"));
-		double lon = Double.parseDouble(record.get("LON")) / 1e6;
-		double lat = Double.parseDouble(record.get("LAT")) / 1e6;
+		double lon = Double.parseDouble(record.get("LON")) / coordinate_precision;
+		double lat = Double.parseDouble(record.get("LAT")) / coordinate_precision;
 		return new Node(id, lon, lat);
 	}
 

@@ -19,7 +19,8 @@ public class ContractorListener extends NodePriorityCalculator {
 	
 	@Override
 	public void considerShortcut(
-			PreparedNode source, PreparedNode target, double weight) {
+			PreparedNode source, PreparedNode target, double weight,
+			PreparedEdge inEdge, PreparedEdge outEdge, PreparedNode viaNode) {
 		
 		shortcutCount++;
 		
@@ -30,13 +31,16 @@ public class ContractorListener extends NodePriorityCalculator {
 				&& (shortcut = shortcuts.get(tuple)).source.equals(target)
 				&& shortcut.weight == weight) {
 			
-			shortcut.direction = EdgeDirection.BIDIRECTIONAL;
+			shortcut.data.direction = EdgeDirection.BIDIRECTIONAL;
 	
 		} else {
 		
 			shortcut = new PreparedEdge(source, target, weight);
-			shortcut.direction = EdgeDirection.FORWARD;
-			shortcut.shortcut = true;
+			shortcut.data.direction = EdgeDirection.FORWARD;
+			shortcut.data.shortcut = true;
+			shortcut.data.viaNode = viaNode;
+			shortcut.data.inEdge = inEdge;
+			shortcut.data.outEdge = outEdge;
 			shortcuts.put(new NodeTuple(source, target), shortcut);
 			
 		}

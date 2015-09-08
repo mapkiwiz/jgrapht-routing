@@ -17,7 +17,8 @@ public abstract class CSVEdgeListGraphLoaderBase<V, E, VID> extends AbstractEdge
 	
 	private final URL edgeFileURL;
 	private final URL nodeFileURL;
-	private final CSVFormat format;
+	protected final CSVFormat format;
+	protected double coordinate_precision = 1.0;
 	
 	public CSVEdgeListGraphLoaderBase(String nodeFilename, String edgeFilename) throws MalformedURLException {
 		this(new URL("file://" + nodeFilename), new URL("file://" + edgeFilename), '\t');
@@ -34,7 +35,11 @@ public abstract class CSVEdgeListGraphLoaderBase<V, E, VID> extends AbstractEdge
 		this.format = CSVFormat.newFormat(delimiter).withSkipHeaderRecord(true);
 	}
 	
-	private Reader getReader(URL url) throws IOException {
+	public void setCoordinatePrecision(int precision) {
+		this.coordinate_precision = Math.pow(10, precision);
+	}
+	
+	protected Reader getReader(URL url) throws IOException {
 		if (url.getFile().endsWith(".gz")) {
 			InputStream in = url.openStream();
 			GZIPInputStream gis = new GZIPInputStream(in);
@@ -44,10 +49,10 @@ public abstract class CSVEdgeListGraphLoaderBase<V, E, VID> extends AbstractEdge
 		}
 	}
 	
-	public Iterator<V> getNodeIterator() throws IOException {
+	protected Iterator<V> getNodeIterator() throws IOException {
 		
 		Reader reader = getReader(nodeFileURL);
-		Iterable<CSVRecord> records = format.withHeader("ID", "LON", "LAT", "LEVEL").parse(reader);
+		Iterable<CSVRecord> records = format.withHeader(getNodeHeader()).parse(reader);
 		final Iterator<CSVRecord> recordIterator = records.iterator();
 		
 		return new Iterator<V>() {
@@ -68,10 +73,18 @@ public abstract class CSVEdgeListGraphLoaderBase<V, E, VID> extends AbstractEdge
 		
 	}
 	
-	public Iterator<EdgeData> getEdgeIterator() throws IOException {
+	protected String[] getNodeHeader() {
+		return new String[] { "ID", "LON", "LAT" };
+	}
+	
+	protected String[] getEdgeHeader() {
+		return new String[] { "SOURCE", "TARGET", "WEIGHT" };
+	}
+	
+	protected Iterator<EdgeData> getEdgeIterator() throws IOException {
 		
 		Reader reader = getReader(edgeFileURL);
-		Iterable<CSVRecord> records = format.withHeader("SOURCE", "TARGET", "WEIGHT", "DATA").parse(reader);
+		Iterable<CSVRecord> records = format.withHeader(getEdgeHeader()).parse(reader);
 		final Iterator<CSVRecord> recordIterator = records.iterator();
 		
 		return new Iterator<EdgeData>() {
@@ -100,7 +113,6 @@ public abstract class CSVEdgeListGraphLoaderBase<V, E, VID> extends AbstractEdge
 		data.source = Long.parseLong(record.get("SOURCE"));
 		data.target = Long.parseLong(record.get("TARGET"));
 		data.weight = Double.parseDouble(record.get("WEIGHT"));
-		// data.data = record.get("DATA");
 		
 		return data;
 		

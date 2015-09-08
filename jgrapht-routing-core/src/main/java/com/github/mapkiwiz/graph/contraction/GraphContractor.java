@@ -1,13 +1,13 @@
 package com.github.mapkiwiz.graph.contraction;
 
+import java.net.URL;
 import java.util.PriorityQueue;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.util.ClassUtils;
+
+import com.github.mapkiwiz.util.TextProgressTracker;
 
 public class GraphContractor {
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(GraphContractor.class);
 	
 	private ShortcutFinder shortcutFinder = new ShortcutFinder();
 	
@@ -15,11 +15,7 @@ public class GraphContractor {
 		
 //		PrioritizeTask task = new DefaultPrioritizeTask(shortcutFinder);
 		PrioritizeTask task = new ConcurrentPrioritizeTask(shortcutFinder, 4);
-		
-		long startTime = System.currentTimeMillis();
 		PriorityQueue<QueueEntry> queue = task.prioritize(graph, minLevel);
-		long duration = System.currentTimeMillis() - startTime;
-		LOGGER.info("Node prioritization : " + (duration / 1000.0) + " .s");
 		
 		return queue;
 		
@@ -31,19 +27,15 @@ public class GraphContractor {
 		int shortcutCount = 0;
 		int iteration = 0;
 		int level = 0;
-		LOGGER.info("Contracting {} edges for {} nodes", graph.edgeSet().size(), totalNodeCount);
+		TextProgressTracker tracker = new TextProgressTracker("Contracting graph", totalNodeCount); 
+		tracker.logMessage("Input nodes : " + totalNodeCount);
+		tracker.logMessage("Input edges : " + graph.edgeSet().size());
 		
 		PriorityQueue<QueueEntry> queue = prioritize(graph, level);
-		LOGGER.info("Contraction initialized");
 		
 		while (!queue.isEmpty()) {
 			
 			iteration++;
-			
-			if (iteration % 1e4 == 0) {
-				int nodeCount = level;
-				LOGGER.info("Processed {} nodes / {}", nodeCount, totalNodeCount);
-			}
 			
 			if (iteration % 3e5 == 0) {
 				queue = prioritize(graph, level);
@@ -60,29 +52,26 @@ public class GraphContractor {
 				continue;
 			}
 			
-			LOGGER.debug("Removing {}", next.node);
-			
 			next.node.level = level;
 			
 			for (PreparedEdge edge : listener.getContractedEdges()) {
-				if (edge.level > level) {
-					edge.level = level;
+				if (edge.data.level > level) {
+					edge.data.level = level;
 				}
 			}
 			
 			for (PreparedEdge shortcut : listener.getShortcuts()) {
-				shortcut.viaNode = next.node;
 				graph.addEdge(shortcut.source, shortcut.target, shortcut);
 				shortcutCount++;
 			}
 			
 			level++;
+			tracker.increment();
 			
 		}
 		
-		LOGGER.info("Added shortcuts : {}", shortcutCount);
-		LOGGER.debug("Max node level : {}", level);
-		
+		tracker.done();
+		tracker.logMessage("Added shortcuts : " + shortcutCount);
 		graph.contracted = true;
 		
 	}
@@ -111,6 +100,38 @@ public class GraphContractor {
 					return 0;
 				}
 			}
+		}
+		
+	}
+	
+	public static void main(String[] args) {
+		
+		try {
+			
+			URL node_file = ClassUtils.getDefaultClassLoader().getResource("large.nodes.tsv.gz");
+			URL edge_file = ClassUtils.getDefaultClassLoader().getResource("large.edges.tsv.gz");
+			CSVPreparedGraphLoader loader = new CSVPreparedGraphLoader(node_file, edge_file, false);
+			loader.setCoordinatePrecision(6);
+
+			PreparedGraph graph = loader.loadGraph();
+
+			GraphContractor contractor = new GraphContractor();
+
+			long startTime = System.currentTimeMillis();
+			contractor.contract(graph);
+			long duration = System.currentTimeMillis() - startTime;
+
+			System.out.println("Execution time : " + (duration / 1000.0) + " s.");
+
+			PreparedGraphWriter writer = new PreparedGraphWriter();
+			writer.setCoordinatePrecision(6);
+			writer.writeToDisk(graph, "/tmp/rhone-alpes.prepared");
+			
+			System.exit(0);
+		
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			throw new RuntimeException(e);
 		}
 		
 	}

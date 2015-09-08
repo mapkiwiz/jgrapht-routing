@@ -39,7 +39,8 @@ public class ConcurrentPrioritizeTask implements PrioritizeTask {
 		List<Future<List<QueueEntry>>> promises = new ArrayList<Future<List<QueueEntry>>>();
 		
 		totalNodeCount = nodes.size();
-		TextProgressTracker progressTracker = new TextProgressTracker(totalNodeCount);
+		TextProgressTracker progressTracker = new TextProgressTracker("Computing node priority", totalNodeCount);
+		progressTracker.logMessage("Computing node priority with " + nThreads + " threads");
 		
 		for(int i=0; i<nThreads; i++) {
 			int range = totalNodeCount / nThreads;
@@ -69,7 +70,11 @@ public class ConcurrentPrioritizeTask implements PrioritizeTask {
 			}
 		}
 		
-		return new PriorityQueue<QueueEntry>(entries);
+		progressTracker.done();
+		progressTracker.logMessage("Sorting nodes by priority");
+		PriorityQueue<QueueEntry> queue = new PriorityQueue<QueueEntry>(entries);
+		
+		return queue;
 		
 	}
 

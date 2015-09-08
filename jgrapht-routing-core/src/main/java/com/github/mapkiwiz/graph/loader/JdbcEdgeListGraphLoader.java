@@ -109,10 +109,10 @@ public class JdbcEdgeListGraphLoader extends AbstractEdgeListGraphLoader<Node, D
 	}
 
 	@Override
-	public void addEdge(Graph<Node, DefaultWeightedEdge> graph, Node source, Node target, double weight) {
+	public void addEdge(Graph<Node, DefaultWeightedEdge> graph, Node source, Node target, EdgeData data) {
 		
 		DefaultWeightedEdge edge = graph.addEdge(source, target);
-		((SimpleWeightedGraph<Node, DefaultWeightedEdge>) graph).setEdgeWeight(edge, weight);
+		((SimpleWeightedGraph<Node, DefaultWeightedEdge>) graph).setEdgeWeight(edge, data.weight);
 		
 	}
 
