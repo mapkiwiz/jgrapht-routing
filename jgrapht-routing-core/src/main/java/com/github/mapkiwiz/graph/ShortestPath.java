@@ -112,7 +112,7 @@ public class ShortestPath {
 		if (middlePoint != null) {
 			return forwardIterator.getShortestPathLength(middlePoint) + reverseIterator.getShortestPathLength(middlePoint);
 		} else {
-			return 0.0;
+			return Double.POSITIVE_INFINITY;
 		}
 	}
 

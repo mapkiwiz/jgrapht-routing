@@ -12,20 +12,20 @@ import com.github.mapkiwiz.geo.NodeUtils;
 
 public class PriorityQueueDijkstraIterator<V,E> implements DijkstraIterator<V> {
 
-	private final PriorityQueue<QueueEntry<V>> heap;
+	private final PriorityQueue<QueueEntry<V, E>> heap;
 	private final Graph<V,E> graph;
-	private final Map<V, QueueEntry<V>> seen;
-	private QueueEntry<V> next;
+	private final Map<V, QueueEntry<V, E>> seen;
+	private QueueEntry<V, E> next;
 	private int maxNodeLimit = -1;
 	private int nodeCount = 0;
 	
 	public PriorityQueueDijkstraIterator(Graph<V,E> graph, V source) {
 		
 		this.graph = graph;
-		this.heap = new PriorityQueue<QueueEntry<V>>(graph.vertexSet().size() >>> 1);
-		QueueEntry<V> entry = new QueueEntry<V>(source, null, 0.0, 0.0);
+		this.heap = new PriorityQueue<QueueEntry<V, E>>(graph.vertexSet().size() >>> 1);
+		QueueEntry<V, E> entry = new QueueEntry<V, E>(source, null, null, 0.0, 0.0);
 		this.heap.add(entry);
-		this.seen = new HashMap<V, QueueEntry<V>>();
+		this.seen = new HashMap<V, QueueEntry<V, E>>();
 		this.seen.put(source, entry);
 		this.next = null;
 		
@@ -37,7 +37,7 @@ public class PriorityQueueDijkstraIterator<V,E> implements DijkstraIterator<V> {
 	
 	public boolean isSettled(V vertex) {
 		
-		QueueEntry<V> entry = this.seen.get(vertex);
+		QueueEntry<V, E> entry = this.seen.get(vertex);
 		if (entry != null) {
 			return entry.frozen;
 		} else {
@@ -62,7 +62,7 @@ public class PriorityQueueDijkstraIterator<V,E> implements DijkstraIterator<V> {
 			return false;
 		}
 		
-		QueueEntry<V> next = this.heap.poll();
+		QueueEntry<V, E> next = this.heap.poll();
 		
 		while (next != null && next.duplicate) {
 			next = this.heap.poll();
@@ -97,17 +97,17 @@ public class PriorityQueueDijkstraIterator<V,E> implements DijkstraIterator<V> {
 			
 			if (this.seen.containsKey(vertex)) {
 			
-				QueueEntry<V> seenEntry = this.seen.get(vertex);
+				QueueEntry<V, E> seenEntry = this.seen.get(vertex);
 				if (weight < seenEntry.weight) {
 					seenEntry.duplicate = true;
-					QueueEntry<V> entry = new QueueEntry<V>(seenEntry.vertex, next.vertex, weight, path_element_weight);
+					QueueEntry<V, E> entry = new QueueEntry<V, E>(seenEntry.vertex, next.vertex, edge, weight, path_element_weight);
 					this.heap.add(entry);
 					this.seen.put(vertex, entry);
 				}
 				
 			} else {
 				
-				QueueEntry<V> entry = new QueueEntry<V>(vertex, next.vertex, weight, path_element_weight);
+				QueueEntry<V, E> entry = new QueueEntry<V, E>(vertex, next.vertex, edge, weight, path_element_weight);
 				this.heap.add(entry);
 				this.seen.put(vertex, entry);
 			
@@ -123,7 +123,7 @@ public class PriorityQueueDijkstraIterator<V,E> implements DijkstraIterator<V> {
 	
 	public V getParent(V vertex) {
 		
-		QueueEntry<V> entry = this.seen.get(vertex);
+		QueueEntry<V, E> entry = this.seen.get(vertex);
 		if (entry == null) {
 			return null;
 		} else {
@@ -132,9 +132,20 @@ public class PriorityQueueDijkstraIterator<V,E> implements DijkstraIterator<V> {
 		
 	}
 	
+	public E getParentEdge(V vertex) {
+		
+		QueueEntry<V, E> entry = this.seen.get(vertex);
+		if (entry == null) {
+			return null;
+		} else {
+			return entry.edge;
+		}
+		
+	}
+	
 	public double getShortestPathLength(V vertex) {
 		
-		QueueEntry<V> entry = this.seen.get(vertex);
+		QueueEntry<V, E> entry = this.seen.get(vertex);
 		if (entry == null) {
 			return Double.POSITIVE_INFINITY;
 		} else {
@@ -145,7 +156,7 @@ public class PriorityQueueDijkstraIterator<V,E> implements DijkstraIterator<V> {
 	
 	public double getPathElementWeight(V vertex) {
 		
-		QueueEntry<V> entry = this.seen.get(vertex);
+		QueueEntry<V, E> entry = this.seen.get(vertex);
 		if (entry == null) {
 			return Double.POSITIVE_INFINITY;
 		} else {
@@ -156,7 +167,7 @@ public class PriorityQueueDijkstraIterator<V,E> implements DijkstraIterator<V> {
 	
 	public PathElement<V> getPathElement(V vertex) {
 		
-		QueueEntry<V> entry = this.seen.get(vertex);
+		QueueEntry<V, E> entry = this.seen.get(vertex);
 		if (entry == null) {
 			return null;
 		} else {
@@ -188,23 +199,26 @@ public class PriorityQueueDijkstraIterator<V,E> implements DijkstraIterator<V> {
 		throw new UnsupportedOperationException();
 	}
 	
-	static class QueueEntry<V> implements Comparable<QueueEntry<V>> {
+	static class QueueEntry<V, E> implements Comparable<QueueEntry<V, E>> {
 		
 		V vertex;
 		V parent;
+		E edge;
+		
 		double weight; // total weight from origin
 		double path_element_weight; // weight from parent
 		boolean frozen = false;
 		boolean duplicate = false;
 		
-		public QueueEntry(V vertex, V parent, double weight, double path_element_weight) {
+		public QueueEntry(V vertex, V parent, E edge, double weight, double path_element_weight) {
 			this.vertex = vertex;
 			this.parent = parent;
 			this.weight = weight;
 			this.path_element_weight = path_element_weight;
+			this.edge = edge;
 		}
 
-		public int compareTo(QueueEntry<V> o) {
+		public int compareTo(QueueEntry<V, E> o) {
 			if (this.weight > o.weight) {
 				return 1;
 			} else if (this.weight < o.weight) {

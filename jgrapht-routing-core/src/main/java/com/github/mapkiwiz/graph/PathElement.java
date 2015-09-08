@@ -11,5 +11,11 @@ public class PathElement<V> {
 		this.distance = distance;
 		this.weight = weight;
 	}
+	
+	public String toString() {
+		
+		return node.toString() + " cost=" + weight;
+		
+	}
 
 }

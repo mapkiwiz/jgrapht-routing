@@ -4,13 +4,20 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.jgrapht.Graphs;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import com.github.mapkiwiz.geo.NodeUtils;
 import com.github.mapkiwiz.geo.algorithm.ConcaveHullBuilder;
+import com.github.mapkiwiz.geojson.Feature;
+import com.github.mapkiwiz.geojson.FeatureCollection;
+import com.github.mapkiwiz.geojson.LineString;
+import com.github.mapkiwiz.graph.Path;
+import com.github.mapkiwiz.graph.PathElement;
 import com.github.mapkiwiz.graph.SearchByDistance;
 import com.github.mapkiwiz.locator.IndexNodeLocator;
 import com.github.mapkiwiz.test.MissingTestDataset;
@@ -95,6 +102,55 @@ public class PreparedGraphQueryTest {
 		System.out.println("Hull (no shortcut) size : " + hull2.size());
 		System.out.println("Execution time : " + duration + " ms.");
 		System.out.println(NodeUtils.asPolygon(hull2).toGeoJSON());
+		
+	}
+	
+	@Test
+	public void testUnpack() throws IOException {
+
+		PreparedGraph graph = loadLargeGraph();
+		graph.contracted = true;
+		System.out.println("Nodes : " + graph.vertexSet().size());
+		System.out.println("Edges : " + graph.edgeSet().size());
+		
+		IndexNodeLocator<PreparedNode> nodeLocator = new IndexNodeLocator<PreparedNode>(graph.vertexSet());
+		PreparedNode source = nodeLocator.locate(4.834413, 45.767304, 0.05);
+		PreparedNode target = nodeLocator.locate(4.890021, 44.930435, 0.05);
+		
+		System.out.println("Source : " + source);
+		System.out.println("Target : " + target);
+		
+		List<PreparedEdge> packedEdges = graph.shortestPathEdges(source, target);
+		
+		List<List<Double>> coordinates = new ArrayList<List<Double>>();
+		PreparedNode currentNode = source;
+		for (PreparedEdge edge : packedEdges) {
+			coordinates.add(currentNode.asCoordinatePair());
+			currentNode = Graphs.getOppositeVertex(graph, edge, currentNode);
+		}
+		coordinates.add(currentNode.asCoordinatePair());
+		Feature<LineString> packedPath = new Feature<LineString>();
+		packedPath.properties.put("name", "packed");
+		packedPath.geometry = new LineString();
+		packedPath.geometry.coordinates = coordinates;
+		
+		Path<PreparedNode> path = graph.shortestPath(source, target);
+		
+		coordinates = new ArrayList<List<Double>>();
+		for (PreparedNode node : path.getNodeList()) {
+			coordinates.add(node.asCoordinatePair());
+		}
+		Feature<LineString> unpackedPath = new Feature<LineString>();
+		unpackedPath.properties.put("name", "unpacked");
+		unpackedPath.geometry = new LineString();
+		unpackedPath.geometry.coordinates = coordinates;
+		
+		FeatureCollection<LineString> collection = new FeatureCollection<LineString>();
+		collection.features.add(packedPath);
+		collection.features.add(unpackedPath);
+		
+		
+		System.out.println(collection.toGeoJSON());
 		
 	}
 

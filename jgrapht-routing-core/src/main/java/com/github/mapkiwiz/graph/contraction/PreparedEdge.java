@@ -75,8 +75,6 @@ public class PreparedEdge {
 		buffer.append(weight);
 		buffer.append(", ");
 		buffer.append(data.direction);
-		buffer.append(", level=");
-		buffer.append(data.level);
 		buffer.append(")");
 		return buffer.toString();
 	}

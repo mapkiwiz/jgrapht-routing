@@ -71,7 +71,7 @@ public class CSVPreparedGraphLoader extends CSVEdgeListGraphLoaderBase<PreparedN
 		for (CSVRecord record : records) {
 			
 			int id = Integer.parseInt(record.get("ID"));
-			int viaNode = Integer.parseInt(record.get("VIANODE"));
+			long viaNode = Long.parseLong(record.get("VIANODE"));
 			int inEdge = Integer.parseInt(record.get("INEDGE"));
 			int outEdge = Integer.parseInt(record.get("OUTEDGE"));
 			
