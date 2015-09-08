@@ -41,7 +41,7 @@ public class JdbcEdgeListGraphLoaderTest extends AbstractHsqlDbTest {
 		Node target = loader.getNode(AbstractGraphTest.VALENCE_NODE_ID);
 		
 		ShortestPath shortestPath = new ShortestPath(new PriorityQueueDijkstraIterator.Factory());
-		double distance = shortestPath.bidirectionalShortestPathLength(graph, source, target);
+		double distance = shortestPath.shortestPathLength(graph, source, target);
 		System.out.println("Distance : " + distance);
 		
 	}

@@ -1,7 +1,5 @@
 package com.github.mapkiwiz.graph.contraction;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -32,33 +30,9 @@ public class PreparedEdge {
 		this.data = new PreparedEdgeData();
 	}
 	
-	public List<PreparedNode> unpack() {
+	public List<PreparedEdge> unpack() {
 		
-		if (data == null || !data.shortcut) {
-			return Collections.emptyList();
-		}
-		
-		List<PreparedNode> viaNodes = new ArrayList<PreparedNode>();
-		
-		if (data.inEdge.data.shortcut) {
-			List<PreparedNode> inViaNodes = data.inEdge.unpack();
-			if (data.inEdge.source.equals(data.viaNode)) {
-				Collections.reverse(inViaNodes);
-			}
-			viaNodes.addAll(inViaNodes);
-		}
-		
-		viaNodes.add(data.viaNode);
-		
-		if (data.outEdge.data.shortcut) {
-			List<PreparedNode> outViaNodes = data.outEdge.unpack();
-			if (data.outEdge.target.equals(data.viaNode)) {
-				Collections.reverse(outViaNodes);
-			}
-			viaNodes.addAll(outViaNodes);
-		}
-		
-		return viaNodes;
+		return PathUnpacker.unpack(this, source, target);
 		
 	}
 	

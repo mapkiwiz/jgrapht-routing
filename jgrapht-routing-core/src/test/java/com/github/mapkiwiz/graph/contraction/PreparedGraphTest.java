@@ -23,7 +23,7 @@ public class PreparedGraphTest {
 			nodeMap.put(node.id, node);
 		}
 		
-		double distance = shortestPath.shortestPathLength(graph,
+		double distance = shortestPath.unidirectionalShortestPathLength(graph,
 				nodeMap.get(1L),
 				nodeMap.get(13L));
 		

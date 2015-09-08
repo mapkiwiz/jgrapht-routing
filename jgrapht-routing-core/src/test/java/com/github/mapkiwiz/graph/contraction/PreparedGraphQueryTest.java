@@ -17,7 +17,6 @@ import com.github.mapkiwiz.geojson.Feature;
 import com.github.mapkiwiz.geojson.FeatureCollection;
 import com.github.mapkiwiz.geojson.LineString;
 import com.github.mapkiwiz.graph.Path;
-import com.github.mapkiwiz.graph.PathElement;
 import com.github.mapkiwiz.graph.SearchByDistance;
 import com.github.mapkiwiz.locator.IndexNodeLocator;
 import com.github.mapkiwiz.test.MissingTestDataset;
@@ -62,7 +61,7 @@ public class PreparedGraphQueryTest {
 		double avgDuration = 0.0;
 		for (int i=0; i<500; i++) {
 			startTime = System.currentTimeMillis();
-			distance = graph.shortestPathLength(source, target);
+			graph.shortestPath(source, target);
 			duration = System.currentTimeMillis() - startTime;
 			assertTrue("Path has not null length", distance > 0);
 			avgDuration = (i * avgDuration + duration) / (i+1);
@@ -149,8 +148,8 @@ public class PreparedGraphQueryTest {
 		collection.features.add(packedPath);
 		collection.features.add(unpackedPath);
 		
-		
 		System.out.println(collection.toGeoJSON());
+		System.out.println("Cost : " + path.getTotalWeight());
 		
 	}
 

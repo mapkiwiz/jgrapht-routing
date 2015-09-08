@@ -15,5 +15,9 @@ public interface DijkstraIterator<V> extends Iterator<V> {
 	public Path<V> getPath(V vertex);
 	
 	public boolean isSettled(V vertex);
+	
+	public boolean isSeenVertex(V vertex);
+	
+	public void setEntryObserver(EntryObserver<V> observer);
 
 }

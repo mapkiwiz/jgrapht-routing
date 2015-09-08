@@ -18,6 +18,7 @@ public class PriorityQueueDijkstraIterator<V,E> implements DijkstraIterator<V> {
 	private QueueEntry<V, E> next;
 	private int maxNodeLimit = -1;
 	private int nodeCount = 0;
+	private EntryObserver<V> entryObserver;
 	
 	public PriorityQueueDijkstraIterator(Graph<V,E> graph, V source) {
 		
@@ -44,6 +45,12 @@ public class PriorityQueueDijkstraIterator<V,E> implements DijkstraIterator<V> {
 			return false;
 		}
 	
+	}
+	
+	public boolean isSeenVertex(V vertex) {
+		
+		return this.seen.containsKey(vertex);
+		
 	}
 	
 	public boolean hasNext() {
@@ -100,7 +107,8 @@ public class PriorityQueueDijkstraIterator<V,E> implements DijkstraIterator<V> {
 				QueueEntry<V, E> seenEntry = this.seen.get(vertex);
 				if (weight < seenEntry.weight) {
 					seenEntry.duplicate = true;
-					QueueEntry<V, E> entry = new QueueEntry<V, E>(seenEntry.vertex, next.vertex, edge, weight, path_element_weight);
+					QueueEntry<V, E> entry = new QueueEntry<V, E>(vertex, next.vertex, edge, weight, path_element_weight);
+					this.emit(entry);
 					this.heap.add(entry);
 					this.seen.put(vertex, entry);
 				}
@@ -108,6 +116,7 @@ public class PriorityQueueDijkstraIterator<V,E> implements DijkstraIterator<V> {
 			} else {
 				
 				QueueEntry<V, E> entry = new QueueEntry<V, E>(vertex, next.vertex, edge, weight, path_element_weight);
+				this.emit(entry);
 				this.heap.add(entry);
 				this.seen.put(vertex, entry);
 			
@@ -119,6 +128,16 @@ public class PriorityQueueDijkstraIterator<V,E> implements DijkstraIterator<V> {
 		this.next = null;
 		return vertex;
 		
+	}
+	
+	public void emit(QueueEntry<V, E> entry) {
+		if (entryObserver != null) {
+			entryObserver.observe(this, entry.vertex, entry.weight);
+		}
+	}
+	
+	public void setEntryObserver(EntryObserver<V> observer) {
+		this.entryObserver = observer;
 	}
 	
 	public V getParent(V vertex) {
@@ -213,9 +232,9 @@ public class PriorityQueueDijkstraIterator<V,E> implements DijkstraIterator<V> {
 		public QueueEntry(V vertex, V parent, E edge, double weight, double path_element_weight) {
 			this.vertex = vertex;
 			this.parent = parent;
+			this.edge = edge;
 			this.weight = weight;
 			this.path_element_weight = path_element_weight;
-			this.edge = edge;
 		}
 
 		public int compareTo(QueueEntry<V, E> o) {

@@ -31,6 +31,7 @@ public abstract class AbstractGraphTest {
 		URL edge_file = getClass().getClassLoader().getResource("test.edges.tsv");
 
 		CSVEdgeListGraphLoader graphLoader = new CSVEdgeListGraphLoader(node_file, edge_file);
+		graphLoader.setCoordinatePrecision(6);
 		Graph<Node, DefaultWeightedEdge> graph;
 		
 		try {
@@ -52,6 +53,7 @@ public abstract class AbstractGraphTest {
 		URL nodeFile = getClass().getClassLoader().getResource("large.nodes.tsv.gz");
 		URL edgeFile = getClass().getClassLoader().getResource("large.edges.tsv.gz");
 		CSVEdgeListGraphLoader graphLoader = new CSVEdgeListGraphLoader(nodeFile, edgeFile);
+		graphLoader.setCoordinatePrecision(6);
 		Graph<Node, DefaultWeightedEdge> graph;
 		
 		try {

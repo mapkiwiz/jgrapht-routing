@@ -9,7 +9,6 @@ import org.jgrapht.graph.SimpleDirectedGraph;
 
 import com.github.mapkiwiz.graph.DijsktraIteratorFactory;
 import com.github.mapkiwiz.graph.Path;
-import com.github.mapkiwiz.graph.PathElement;
 import com.github.mapkiwiz.graph.ShortestPath;
 
 public class PreparedGraph extends SimpleDirectedGraph<PreparedNode, PreparedEdge> {
@@ -65,7 +64,7 @@ public class PreparedGraph extends SimpleDirectedGraph<PreparedNode, PreparedEdg
 		
 		DijsktraIteratorFactory factory = new PreparedGraphIterator.Factory();
 		ShortestPath shortestPath = new ShortestPath(factory);
-		return shortestPath.bidirectionalShortestPathLength(this, source, target);
+		return shortestPath.shortestPathLength(this, source, target);
 		
 	}
 	
@@ -74,26 +73,10 @@ public class PreparedGraph extends SimpleDirectedGraph<PreparedNode, PreparedEdg
 		PreparedGraphIterator forwardIterator = new PreparedGraphIterator(this, source);
 		PreparedGraphIterator reverseIterator = new PreparedGraphIterator(this, target);
 		
-		PreparedNode middlePoint = null;
-		
-		while (forwardIterator.hasNext() && reverseIterator.hasNext()) {
-			
-			if (forwardIterator.hasNext()) {
-				PreparedNode next = forwardIterator.next();
-				if (reverseIterator.isSettled(next)) {
-					middlePoint = next;
-					break;
-				}
-			}
-			
-			if (reverseIterator.hasNext()) {
-				PreparedNode next = reverseIterator.next();
-				if (forwardIterator.isSettled(next)) {
-					middlePoint = next;
-					break;
-				}
-			}
-			
+		PreparedNode middlePoint = ShortestPath.bidirectionalDijkstra(forwardIterator, reverseIterator);
+	
+		if (middlePoint == null) {
+			return Collections.emptyList();
 		}
 		
 		PreparedEdge edge;
@@ -119,68 +102,8 @@ public class PreparedGraph extends SimpleDirectedGraph<PreparedNode, PreparedEdg
 	
 	public Path<PreparedNode> shortestPath(PreparedNode source, PreparedNode target) {
 		
-		List<PreparedEdge> edges = shortestPathEdges(source, target);
-		List<PreparedEdge> unpackedEdges = new ArrayList<PreparedEdge>();
-		
-		PreparedNode currentNode = source;
-		
-		for (PreparedEdge edge : edges) {
-			
-			PreparedNode nextNode = Graphs.getOppositeVertex(this, edge, currentNode);
-			List<PreparedEdge> unpacked = unpack(edge, currentNode, nextNode);
-			
-			if (unpacked.size() > 0 && edge.target.equals(currentNode)) {
-				Collections.reverse(unpacked);
-			}
-			
-			unpackedEdges.addAll(unpacked);
-			currentNode = nextNode;
-			
-		}
-		
-		List<PathElement<PreparedNode>> pathElements = new ArrayList<PathElement<PreparedNode>>();
-		currentNode = source;
-		
-		for (PreparedEdge edge : unpackedEdges) {
-			pathElements.add(new PathElement<PreparedNode>(currentNode, edge.weight, edge.weight));
-			currentNode = Graphs.getOppositeVertex(this, edge, currentNode);
-		}
-		
-		pathElements.add(new PathElement<PreparedNode>(target, 0.0, 0.0));
-		
-		return new Path<PreparedNode>(pathElements);
-		
-	}
-	
-	public List<PreparedEdge> unpack(PreparedEdge edge, PreparedNode source, PreparedNode target) {
-		
-		if (edge.data == null || !edge.data.shortcut) {
-			return Collections.singletonList(edge);
-		}
-		
-		List<PreparedEdge> edges = new ArrayList<PreparedEdge>();
-		
-		if (edge.data.inEdge.data.shortcut) {
-			List<PreparedEdge> inEdges = unpack(edge.data.inEdge, source, edge.data.viaNode);
-			if (edge.data.inEdge.source.equals(edge.data.viaNode)) {
-				Collections.reverse(inEdges);
-			}
-			edges.addAll(inEdges);
-		} else {
-			edges.add(edge.data.inEdge);
-		}
-		
-		if (edge.data.outEdge.data.shortcut) {
-			List<PreparedEdge> outEdges = unpack(edge.data.outEdge, edge.data.viaNode, target);
-			if (edge.data.outEdge.target.equals(edge.data.viaNode)) {
-				Collections.reverse(outEdges);
-			}
-			edges.addAll(outEdges);
-		} else {
-			edges.add(edge.data.outEdge);
-		}
-		
-		return edges;
+		List<PreparedEdge> packedEdges = shortestPathEdges(source, target);
+		return PathUnpacker.unpack(packedEdges, source, target);
 		
 	}
 

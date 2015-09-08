@@ -1,8 +1,6 @@
 package com.github.mapkiwiz.graph;
 
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.jgrapht.Graph;
 
@@ -14,7 +12,7 @@ public class ShortestPath {
 		this.iteratorFactory = factory;
 	}
 
-	public <V,E> double shortestPathLength(Graph<V, E> graph, V source, V target) {
+	public <V,E> double unidirectionalShortestPathLength(Graph<V, E> graph, V source, V target) {
 
 		DijkstraIterator<V> iterator = this.iteratorFactory.create(graph, source);
 
@@ -28,6 +26,43 @@ public class ShortestPath {
 		return iterator.getShortestPathLength(target);
 
 	}
+	
+	public static <V> V bidirectionalDijkstra(DijkstraIterator<V> forwardIterator, DijkstraIterator<V> reverseIterator) {
+		
+		BestPathObserver<V> observer = new BestPathObserver<V>(forwardIterator, reverseIterator);
+		
+		V middlePoint = null;
+		double forwardWeight = 0.0;
+		double reverseWeight = 0.0;
+		
+		while (forwardIterator.hasNext() && reverseIterator.hasNext()) {
+			
+			if (forwardIterator.hasNext()) {
+				V next = forwardIterator.next();
+				forwardWeight = forwardIterator.getShortestPathLength(next);
+				if (forwardWeight + reverseWeight >= observer.getMinWeight()) {
+					if (observer.isMiddlePointSettled()) {
+						break;
+					}
+				}
+			}
+			
+			if (reverseIterator.hasNext()) {
+				V next = reverseIterator.next();
+				reverseWeight = reverseIterator.getShortestPathLength(next);
+				if (forwardWeight + reverseWeight >= observer.getMinWeight()) {
+					if (observer.isMiddlePointSettled()) {
+						break;
+					}
+				}
+			}
+			
+		}
+		
+		middlePoint = observer.getMiddlePoint();
+		return middlePoint;
+		
+	}
 
 	public <V,E> Path<V> shortestPath(Graph<V,E> graph, V source, V target) {
 
@@ -36,32 +71,7 @@ public class ShortestPath {
 		DijkstraIterator<V> reverseIterator =
 				this.iteratorFactory.create(graph, target);
 
-		Set<V> forwardSet = new HashSet<V>();
-		Set<V> reverseSet = new HashSet<V>();
-		V middlePoint = null;
-
-		while (forwardIterator.hasNext() && reverseIterator.hasNext()) {
-
-			if (forwardIterator.hasNext()) {
-				V next = forwardIterator.next();
-				if (reverseSet.contains(next)) {
-					middlePoint = next;
-					break;
-				} else {
-					forwardSet.add(next);
-				}
-			}
-
-			if (reverseIterator.hasNext()) {
-				V next = reverseIterator.next();
-				if (forwardSet.contains(next)) {
-					middlePoint = next;
-					break;
-				} else {
-					reverseSet.add(next);
-				}
-			}
-		}
+		V middlePoint = bidirectionalDijkstra(forwardIterator, reverseIterator);
 
 		if (middlePoint != null) {
 
@@ -81,33 +91,14 @@ public class ShortestPath {
 
 	}
 
-	public <V,E> double bidirectionalShortestPathLength(Graph<V, E> graph, V source, V target) {
+	public <V,E> double shortestPathLength(Graph<V, E> graph, V source, V target) {
 
 		DijkstraIterator<V> forwardIterator =
 				this.iteratorFactory.create(graph, source);
 		DijkstraIterator<V> reverseIterator =
 				this.iteratorFactory.create(graph, target);
 
-		V middlePoint = null;
-
-		while (forwardIterator.hasNext() && reverseIterator.hasNext()) {
-
-			if (forwardIterator.hasNext()) {
-				V next = forwardIterator.next();
-				if (reverseIterator.isSettled(next)) {
-					middlePoint = next;
-					break;
-				}
-			}
-
-			if (reverseIterator.hasNext()) {
-				V next = reverseIterator.next();
-				if (forwardIterator.isSettled(next)) {
-					middlePoint = next;
-					break;
-				}
-			}
-		}
+		V middlePoint = bidirectionalDijkstra(forwardIterator, reverseIterator);
 
 		if (middlePoint != null) {
 			return forwardIterator.getShortestPathLength(middlePoint) + reverseIterator.getShortestPathLength(middlePoint);

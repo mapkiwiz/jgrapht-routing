@@ -78,4 +78,13 @@ public class FibonacciHeapDijkstraIterator<V,E> implements DijkstraIterator<V> {
 		return (this.iterator.getShortestPathLength(vertex) < Double.POSITIVE_INFINITY);
 	}
 
+	public boolean isSeenVertex(V vertex) {
+//		return iterator.isSeenVertex(vertex);
+		throw new UnsupportedOperationException();
+	}
+
+	public void setEntryObserver(EntryObserver<V> observer) {
+		throw new UnsupportedOperationException();
+	}
+
 }

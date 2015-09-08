@@ -29,7 +29,7 @@ public class ShortestPathTest extends AbstractGraphTest {
 		
 		ShortestPath shortestPath = new ShortestPath(
 				new PriorityQueueDijkstraIterator.Factory());
-		double distance = shortestPath.shortestPathLength(graph, source, target);
+		double distance = shortestPath.unidirectionalShortestPathLength(graph, source, target);
 		assertTrue("Path has not of null length", distance > 0);
 		
 		assertTrue("Distance 0->899 is 709.0 u.", distance == 709.0);
@@ -45,11 +45,10 @@ public class ShortestPathTest extends AbstractGraphTest {
 		
 		ShortestPath shortestPath = new ShortestPath(
 				new PriorityQueueDijkstraIterator.Factory());
-		double distance = shortestPath.bidirectionalShortestPathLength(graph, source, target);
-		System.out.println(distance);
+		double distance = shortestPath.shortestPathLength(graph, source, target);
 		
 		assertTrue("Path has not of null length", distance > 0);
-		assertTrue("Distance 0->899 is 710.0 u.", distance == 710.0); // Not exact resulat, should be 709.0
+		assertTrue("Distance 0->899 is 709.0 u.", distance == 709.0);
 		
 	}
 
@@ -64,7 +63,7 @@ public class ShortestPathTest extends AbstractGraphTest {
 		long start = System.currentTimeMillis();
 		ShortestPath shortestPath = new ShortestPath(
 				new PriorityQueueDijkstraIterator.Factory());
-		double distance = shortestPath.shortestPathLength(graph, source, target);
+		double distance = shortestPath.unidirectionalShortestPathLength(graph, source, target);
 		long duration = System.currentTimeMillis() - start;
 		
 		System.out.println("Distance : " + distance);
@@ -84,7 +83,7 @@ public class ShortestPathTest extends AbstractGraphTest {
 		long start = System.currentTimeMillis();
 		ShortestPath shortestPath = new ShortestPath(
 				new PriorityQueueDijkstraIterator.Factory());
-		double distance = shortestPath.bidirectionalShortestPathLength(graph, source, target);
+		double distance = shortestPath.shortestPathLength(graph, source, target);
 		long duration = System.currentTimeMillis() - start;
 		
 		System.out.println("Distance : " + distance);
