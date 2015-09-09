@@ -31,7 +31,7 @@ public class TestConcaveHullBuilder extends AbstractGraphTest {
 				new Isochrone(new PriorityQueueDijkstraIterator.Factory());
 		List<Node> isochrone = processor.isochrone(graph, source, distance);
 		
-		ConcaveHullBuilder builder = new ConcaveHullBuilder();
+		ConcaveHullBuilder<Node> builder = new ConcaveHullBuilder<Node>();
 		List<Node> hull = builder.buildHull(isochrone);
 		
 		assertNotNull(hull);
@@ -53,7 +53,7 @@ public class TestConcaveHullBuilder extends AbstractGraphTest {
 				new Isochrone(new PriorityQueueDijkstraIterator.Factory());
 		List<Node> isochrone = processor.isochrone(graph, source, distance);
 		
-		ConcaveHullBuilder builder = new ConcaveHullBuilder();
+		ConcaveHullBuilder<Node> builder = new ConcaveHullBuilder<Node>();
 		
 		double avg_duration_index = 0.0;
 		double avg_duration_hull = 0.0;

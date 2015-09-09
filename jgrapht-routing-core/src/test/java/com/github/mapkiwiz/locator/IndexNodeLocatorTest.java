@@ -20,7 +20,7 @@ public class IndexNodeLocatorTest extends AbstractGraphTest {
 	public void testLocate() throws IOException {
 		
 		Graph<Node, DefaultWeightedEdge> graph = loadLargeGraph();
-		IndexNodeLocator locator = new IndexNodeLocator(graph.vertexSet());
+		IndexNodeLocator<Node> locator = new IndexNodeLocator<Node>(graph.vertexSet());
 		/*  id    |       lon        |       lat        
 			-------+------------------+------------------
  			24951 | 4.83441389858932 | 45.7673043893699

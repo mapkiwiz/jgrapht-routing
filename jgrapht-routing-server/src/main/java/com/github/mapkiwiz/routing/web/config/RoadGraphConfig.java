@@ -51,6 +51,7 @@ public class RoadGraphConfig {
 	public GraphHolder roadGraph(
 			@Value("${data.node.file.url}") URL nodeFileURL,
 			@Value("${data.edge.file.url}") URL edgeFileURL,
+			@Value("${data.shortcut.file.url}") URL shortcutFileURL,
 			@Value("${data.prepared}") boolean prepared,
 			@Value("${data.coordinate.precision}") int precision) throws IOException {
 		
@@ -72,7 +73,12 @@ public class RoadGraphConfig {
 		
 		if (prepared) {
 			LOGGER.info("Loading prepared graph from TSV files");
-			CSVPreparedGraphLoader loader = new CSVPreparedGraphLoader(nodeFileURL, edgeFileURL, true);
+			CSVPreparedGraphLoader loader;
+			if (shortcutFileURL != null) {
+				loader = new CSVPreparedGraphLoader(nodeFileURL, edgeFileURL, shortcutFileURL);
+			} else {
+				loader = new CSVPreparedGraphLoader(nodeFileURL, edgeFileURL, true);
+			}
 			loader.setCoordinatePrecision(precision);
 			graph = loader.loadGraph();
 		} else {

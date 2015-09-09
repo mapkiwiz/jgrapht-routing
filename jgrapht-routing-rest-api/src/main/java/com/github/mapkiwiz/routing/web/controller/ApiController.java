@@ -1,8 +1,6 @@
 package com.github.mapkiwiz.routing.web.controller;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -20,23 +18,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.mapkiwiz.geo.Node;
-import com.github.mapkiwiz.geo.NodeUtils;
-import com.github.mapkiwiz.geo.algorithm.ConcaveHullBuilder;
-import com.github.mapkiwiz.geo.algorithm.ConvexHullBuilder;
 import com.github.mapkiwiz.geojson.Feature;
 import com.github.mapkiwiz.geojson.LineString;
 import com.github.mapkiwiz.geojson.Point;
 import com.github.mapkiwiz.geojson.Polygon;
 import com.github.mapkiwiz.graph.DijsktraIteratorFactory;
-import com.github.mapkiwiz.graph.DistanceMatrix;
-import com.github.mapkiwiz.graph.Isochrone;
 import com.github.mapkiwiz.graph.Path;
-import com.github.mapkiwiz.graph.PathElement;
-import com.github.mapkiwiz.graph.ShortestPath;
+import com.github.mapkiwiz.graph.PathUtils;
 import com.github.mapkiwiz.graph.contraction.PreparedGraph;
 import com.github.mapkiwiz.locator.NodeLocator;
+import com.github.mapkiwiz.routing.web.controller.method.DistanceMatrixQuery;
 import com.github.mapkiwiz.routing.web.controller.method.DistanceQuery;
+import com.github.mapkiwiz.routing.web.controller.method.IsochroneQuery;
 import com.github.mapkiwiz.routing.web.controller.method.PreparedDistanceQuery;
+import com.github.mapkiwiz.routing.web.controller.method.PreparedRouteQuery;
+import com.github.mapkiwiz.routing.web.controller.method.RouteQuery;
 import com.timgroup.statsd.StatsDClient;
 
 
@@ -150,7 +146,7 @@ public class ApiController extends ApiControllerBase implements DisposableBean {
 		
 	}
 	
-	private Node getNodeFromLocParameter(List<Double> loc) throws InvalidParameterFormat, NearestNodeNotFound {
+	public Node getNodeFromLocParameter(List<Double> loc) throws InvalidParameterFormat, NearestNodeNotFound {
 		
 		if (loc.size() != 2) {
 			throw new InvalidParameterFormat("source and target parameters must be in the form lon,lat");
@@ -181,30 +177,13 @@ public class ApiController extends ApiControllerBase implements DisposableBean {
 		
 		stats.recordExecutionTime("locate.execution", (System.currentTimeMillis() - startTime) / 2);
 		
-		Future<Path<Node>> promise = this.worker.submit(
-				new Callable<Path<Node>>() {
-
-					public Path<Node> call() throws Exception {
+		Future<Path<Node>> promise;
 		
-						if (LOGGER.isDebugEnabled()) {
-							LOGGER.debug("[route] Entering thread pool");
-						}
-						
-						long startTime = System.currentTimeMillis();
-						ShortestPath shortestPath = new ShortestPath(iteratorFactory);
-						Path<Node> path = shortestPath.shortestPath(graphHolder.getGraph(Node.class), sourceNode, targetNode);
-						stats.recordExecutionTimeToNow("shortest_path.execution", startTime);
-						
-						if (LOGGER.isDebugEnabled()) {
-							long duration = System.currentTimeMillis() - startTime;
-							LOGGER.debug("[route] Exiting thread pool, execution time {} ms.", duration);
-						}
-						
-						return path;
-						
-					}
-		
-		});
+		if (graphHolder.isPrepared()) {
+			promise = this.worker.submit(new PreparedRouteQuery(this, sourceNode, targetNode));
+		} else {
+			promise = this.worker.submit(new RouteQuery(this, sourceNode, targetNode));
+		}
 		
 		Path<Node> path;
 		
@@ -223,24 +202,7 @@ public class ApiController extends ApiControllerBase implements DisposableBean {
 			throw new NoPathBetweenPoints(sourceNode, targetNode);
 		}
 		
-		List<List<Double>> coordinates = new ArrayList<List<Double>>();
-		double distance = 0.0;
-		double time = 0.0;
-		
-		for (PathElement<Node> segment : path.elements) {
-			coordinates.add(segment.node.asCoordinatePair());
-			distance += segment.distance;
-			time += segment.weight;
-		}
-		
-		LineString geometry = new LineString();
-		geometry.coordinates = coordinates;
-		Feature<LineString> feature = new Feature<LineString>();
-		feature.geometry = geometry;
-		feature.properties.put("source", sourceNode.id);
-		feature.properties.put("target", targetNode.id);
-		feature.properties.put("distance", distance);
-		feature.properties.put("time", time);
+		Feature<LineString> feature = PathUtils.toFeature(path);
 		
 		stats.recordExecutionTimeToNow("route.request.execution.total", startTime);
 		stats.increment("route.request.count");
@@ -269,27 +231,7 @@ public class ApiController extends ApiControllerBase implements DisposableBean {
 		}
 		
 		Future<Polygon> promise =
-				this.worker.submit(new Callable<Polygon>() {
-
-			public Polygon call() throws Exception {
-				
-				List<Node> hull;
-				Isochrone processor = new Isochrone(iteratorFactory);
-				List<Node> nodes = processor.isochrone(graphHolder.getGraph(Node.class), node, distance);
-				
-				if (concaveHull) {
-					ConcaveHullBuilder<Node> builder = new ConcaveHullBuilder<Node>();
-					hull = builder.buildHull(nodes);
-				} else {
-					ConvexHullBuilder<Node> builder = new ConvexHullBuilder<Node>();
-					hull = builder.buildHull(nodes);
-				}
-				
-				return NodeUtils.asPolygon(hull);
-				
-			}
-			
-		});
+				this.worker.submit(new IsochroneQuery(this, node, distance, concaveHull));
 		
 		Polygon polygon;
 		try {
@@ -314,49 +256,7 @@ public class ApiController extends ApiControllerBase implements DisposableBean {
 		
 		
 		Future<DistanceMatrixInfo> promise =
-				this.worker.submit(new Callable<DistanceMatrixInfo>() {
-
-					public DistanceMatrixInfo call() throws Exception {
-						
-						Node sourceNode = getNodeFromLocParameter(source);
-						
-						Node[] nodes;
-						
-						if (targets.size() == 2 && targets.get(0).size() == 1 && targets.get(1).size() == 1) {
-							
-							double lon = targets.get(0).get(0);
-							double lat = targets.get(1).get(0);
-							nodes = new Node[1];
-							nodes[0] = nodeLocator.locate(lon, lat, searchDistance);
-							
-						} else {
-						
-							nodes = new Node[targets.size()];
-							for (int i=0; i<nodes.length; i++) {
-								nodes[i] = getNodeFromLocParameter(targets.get(i));
-							}
-						
-						}
-						
-						DistanceMatrix<Node> matrix = new DistanceMatrix<Node>();
-						double[] distances =
-								matrix.distances(graphHolder.getGraph(Node.class), sourceNode, nodes);
-						
-						DistanceMatrixInfo matrixInfo = new DistanceMatrixInfo();
-						matrixInfo.source = asFeature(sourceNode);
-						
-						for (int i=0; i<nodes.length; i++) {
-							DistanceMatrixResult result = new DistanceMatrixResult();
-							result.target = asFeature(nodes[i]);
-							result.distance = distances[i];
-							matrixInfo.distances.add(result);
-						}
-						
-						return matrixInfo;
-						
-					}
-				
-				});
+				this.worker.submit(new DistanceMatrixQuery(this, source, targets));
 		
 		try {
 			
