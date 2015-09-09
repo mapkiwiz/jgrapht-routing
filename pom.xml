@@ -56,6 +56,7 @@
 
 	<modules>
 		<module>jgrapht-routing-core</module>
+		<module>jgrapht-routing-contractor</module>
 		<module>jgrapht-routing-rest-api</module>
 		<module>jgrapht-routing-webapp</module>
 		<module>jgrapht-routing-server</module>

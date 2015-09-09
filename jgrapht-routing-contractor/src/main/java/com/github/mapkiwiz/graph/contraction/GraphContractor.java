@@ -1,9 +1,13 @@
 package com.github.mapkiwiz.graph.contraction;
 
-import java.net.URL;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.PriorityQueue;
 
-import org.springframework.util.ClassUtils;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.ParseException;
 
 import com.github.mapkiwiz.util.TextProgressTracker;
 
@@ -108,10 +112,29 @@ public class GraphContractor {
 		
 		try {
 			
-			URL node_file = ClassUtils.getDefaultClassLoader().getResource("large.nodes.tsv.gz");
-			URL edge_file = ClassUtils.getDefaultClassLoader().getResource("large.edges.tsv.gz");
-			CSVPreparedGraphLoader loader = new CSVPreparedGraphLoader(node_file, edge_file, false);
-			loader.setCoordinatePrecision(6);
+			DefaultParser commandLineParser = new DefaultParser();
+			CommandLine options = commandLineParser.parse(new GraphContractorOptions(), args);
+			
+			File node_file = new File(options.getOptionValue("n"));
+			File edge_file = new File(options.getOptionValue("e"));
+			
+			if (!node_file.exists()) {
+				throw new FileNotFoundException(node_file.getName());
+			}
+			
+			if (!edge_file.exists()) {
+				throw new FileNotFoundException(edge_file.getName());
+			}
+			
+			File outputDir = new File(options.getOptionValue("d"));
+			if (!outputDir.exists()) {
+				outputDir.mkdirs();
+			} else if (!outputDir.isDirectory()) {
+				throw new ParseException("output-dir must be a directory");
+			}
+			
+			CSVPreparedGraphLoader loader = new CSVPreparedGraphLoader(node_file.getAbsolutePath(), edge_file.getAbsolutePath(), false);
+			loader.setCoordinatePrecision(Integer.parseInt(options.getOptionValue("p", "0")));
 
 			PreparedGraph graph = loader.loadGraph();
 
@@ -125,10 +148,22 @@ public class GraphContractor {
 
 			PreparedGraphWriter writer = new PreparedGraphWriter();
 			writer.setCoordinatePrecision(6);
-			writer.writeToDisk(graph, "/tmp/rhone-alpes.prepared");
+			writer.writeToDisk(graph, options.getOptionValue("d") + "/prepared");
 			
 			System.exit(0);
 		
+		} catch(ParseException e) {
+			
+			System.out.println(e.getMessage());
+			HelpFormatter helpFormatter = new HelpFormatter();
+			helpFormatter.printHelp(GraphContractor.class.getSimpleName(), new GraphContractorOptions());
+			
+		} catch(FileNotFoundException e) {
+			
+			System.out.println(e.getMessage());
+			HelpFormatter helpFormatter = new HelpFormatter();
+			helpFormatter.printHelp(GraphContractor.class.getSimpleName(), new GraphContractorOptions());
+			
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 			throw new RuntimeException(e);
